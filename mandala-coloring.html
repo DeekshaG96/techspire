@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rangoli Coloring - Aura</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: none;
+            /* Animated Mesh Gradient Background */
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+                background-image: linear-gradient(45deg, #a18cd1 0%, #fbc2eb 100%);
+            }
+
+            50% {
+                background-position: 100% 50%;
+                background-image: linear-gradient(45deg, #84fab0 0%, #8fd3f4 100%);
+            }
+
+            100% {
+                background-position: 0% 50%;
+                background-image: linear-gradient(45deg, #fbc2eb 0%, #a6c1ee 100%);
+            }
+        }
+
+        header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .glass-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: var(--glass-shadow);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .glass-btn:active {
+            transform: scale(0.9);
+        }
+
+        .glass-pill {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* The Canvas Container */
+        .canvas-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            padding-top: 80px;
+            padding-bottom: 100px;
+        }
+
+        .glass-canvas {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: var(--glass-shadow);
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        svg {
+            width: 90%;
+            height: 90%;
+            filter: drop-shadow(0px 4px 10px rgba(0, 0, 0, 0.05));
+        }
+
+        .colorable {
+            fill: #ffffff;
+            stroke: #4A4A4A;
+            stroke-width: 1.5;
+            transition: fill 0.3s ease;
+            cursor: pointer;
+        }
+
+        .colorable:hover {
+            stroke-width: 3;
+        }
+
+        /* Floating Palette */
+        .color-palette {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 15px 20px;
+            box-shadow: var(--glass-shadow);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .color-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-swatch.active {
+            transform: scale(1.15);
+            border-color: #fff;
+        }
+
+        .color-swatch:active {
+            transform: scale(0.9);
+        }
+
+        #clearBtn {
+            position: absolute;
+            bottom: -15px;
+            right: -15px;
+            width: 32px;
+            height: 32px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="wellbeing-hub.html" class="glass-btn"><i class="ph ph-arrow-left"></i></a>
+        <div class="glass-pill"><i class="ph-fill ph-palette"></i> Mandala</div>
+    </header>
+
+    <div class="canvas-wrapper">
+        <div class="glass-canvas" id="canvasContainer">
+            <!-- SVG injected here via JS -->
+            <button class="glass-btn" id="clearBtn" title="Reset Coloring" onclick="resetMandala()"><i
+                    class="ph ph-arrow-counter-clockwise"></i></button>
+        </div>
+    </div>
+
+    <div class="color-palette" id="palette">
+        <!-- Colors injected via JS -->
+    </div>
+
+    <script>
+        const colors = [
+            '#EF476F', // Red
+            '#F78C6B', // Orange
+            '#FFD166', // Yellow
+            '#06D6A0', // Green
+            '#118AB2', // Blue
+            '#073B4C', // Navy
+            '#9D4EDD', // Purple
+            '#FFFFFF'  // Eraser
+        ];
+
+        let currentColor = colors[0];
+        let segmentsColored = 0;
+        const STATE_KEY = 'mandala_state';
+
+        function initApp() {
+            buildPalette();
+            generateRangoliSVG();
+            loadState();
+        }
+
+        function buildPalette() {
+            const container = document.getElementById('palette');
+            colors.forEach((color, i) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color;
+                if (color === '#FFFFFF') {
+                    swatch.innerHTML = '<i class="ph ph-eraser" style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;"></i>';
+                }
+                if (i === 0) swatch.classList.add('active');
+
+                swatch.onclick = () => {
+                    document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+                    swatch.classList.add('active');
+                    currentColor = color;
+                };
+                container.appendChild(swatch);
+            });
+        }
+
+        function generateRangoliSVG() {
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("viewBox", "-100 -100 200 200");
+            svg.id = "rangoliSvg";
+
+            // Symmetrical elements (8 petals)
+            const numSegments = 12;
+            const angleStep = 360 / numSegments;
+
+            // Outer ring
+            for (let i = 0; i < numSegments; i++) {
+                let g = document.createElementNS(svgNS, "g");
+                g.setAttribute("transform", `rotate(${i * angleStep})`);
+
+                // Outer Diamond
+                let path1 = document.createElementNS(svgNS, "path");
+                path1.setAttribute("d", "M 0 -95 L 15 -75 L 0 -55 L -15 -75 Z");
+                path1.setAttribute("class", "colorable");
+                path1.id = `poly_outer_${i}`;
+                g.appendChild(path1);
+
+                // Mid Petal
+                let path2 = document.createElementNS(svgNS, "path");
+                path2.setAttribute("d", "M 0 -55 Q 25 -30 0 -15 Q -25 -30 0 -55 Z");
+                path2.setAttribute("class", "colorable");
+                path2.id = `poly_mid_${i}`;
+                g.appendChild(path2);
+
+                // Inner dots
+                let circ1 = document.createElementNS(svgNS, "circle");
+                circ1.setAttribute("cx", "0");
+                circ1.setAttribute("cy", "-65");
+                circ1.setAttribute("r", "5");
+                circ1.setAttribute("class", "colorable");
+                circ1.id = `circ_inner_${i}`;
+                g.appendChild(circ1);
+
+                svg.appendChild(g);
+            }
+
+            // Center Flower
+            const centerCirc = document.createElementNS(svgNS, "circle");
+            centerCirc.setAttribute("cx", "0");
+            centerCirc.setAttribute("cy", "0");
+            centerCirc.setAttribute("r", "15");
+            centerCirc.setAttribute("class", "colorable");
+            centerCirc.id = `center_circ`;
+            svg.appendChild(centerCirc);
+
+            document.getElementById('canvasContainer').prepend(svg);
+
+            // Attach event listeners
+            document.querySelectorAll('.colorable').forEach(path => {
+                path.addEventListener('click', function () {
+                    this.style.fill = currentColor;
+                    saveState();
+                    gamificationTick();
+                });
+            });
+        }
+
+        function gamificationTick() {
+            segmentsColored++;
+            if (segmentsColored % 10 === 0) {
+                // Earn a point
+                let pts = parseInt(localStorage.getItem('zenPoints') || '0');
+                localStorage.setItem('zenPoints', pts + 1);
+
+                // Confetti blast from bottom
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.9 },
+                    colors: colors.slice(0, -1) // Exclude eraser white
+                });
+            }
+        }
+
+        function saveState() {
+            const state = {};
+            document.querySelectorAll('.colorable').forEach(path => {
+                // Read inline style
+                if (path.style.fill && path.style.fill !== 'rgb(255, 255, 255)') {
+                    state[path.id] = path.style.fill;
+                }
+            });
+            localStorage.setItem(STATE_KEY, JSON.stringify(state));
+        }
+
+        function loadState() {
+            const stateStr = localStorage.getItem(STATE_KEY);
+            if (stateStr) {
+                const state = JSON.parse(stateStr);
+                for (const id in state) {
+                    const el = document.getElementById(id);
+                    if (el) el.style.fill = state[id];
+                }
+            }
+        }
+
+        window.resetMandala = function () {
+            if (confirm("Are you sure you want to clear your beautiful canvas?")) {
+                document.querySelectorAll('.colorable').forEach(path => {
+                    path.style.fill = '#ffffff';
+                });
+                localStorage.removeItem(STATE_KEY);
+            }
+        }
+
+        window.onload = initApp;
+
+    </script>
+</body>
+
+</html>
