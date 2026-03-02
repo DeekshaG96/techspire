@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Wellbeing | Login</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --sage: #9CBFA7;
+            --lavender: #DCD0FF;
+            --cream: #FFFDF9;
+            --blue: #A2C4C9;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--sage), var(--blue));
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4A4A4A;
+        }
+
+        .login-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--glass-shadow);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-top: 0;
+            color: #fff;
+            font-weight: 600;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-container p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0 20px 0;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.4);
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 2px var(--cream);
+        }
+
+        .btn-primary {
+            background: #9B86BD;
+            /* Gentle lavender per user request */
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: transform 0.2s ease, background 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: #8A75AC;
+        }
+
+        .switch-mode {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: white;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            color: #ffcccc;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <h2 id="formTitle"><i class="ph-fill ph-cloud-sun"></i> Aura</h2>
+        <p id="formSubtitle">Welcome to your safe space.</p>
+
+        <div class="error-msg" id="errorMsg"></div>
+
+        <input type="email" id="emailInput" placeholder="Email address" required>
+        <input type="password" id="passwordInput" placeholder="Password" required>
+
+        <button class="btn-primary" id="actionBtn" onclick="handleAuth()">Sign In</button>
+
+        <div class="switch-mode" id="switchBtn" onclick="toggleMode()">New here? Create an account</div>
+
+        <!-- Emergency bypass directly to hub -->
+        <div style="margin-top: 25px; font-size: 0.8rem;">
+            <a href="wellbeing-hub.html" style="color: rgba(255,255,255,0.7); text-decoration: none;">Skip to Hub (Guest
+                Mode)</a>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Implementation -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // IMPORTANT: Replace these with your actual Firebase config details from the console.
+        const firebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "aura-wellbeing.firebaseapp.com",
+            projectId: "aura-wellbeing",
+            storageBucket: "aura-wellbeing.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:12345:web:abc123"
+        };
+
+        let app, auth;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+        } catch (e) {
+            console.warn("Firebase not properly configured yet. Using mock auth mode.");
+        }
+
+        let isLogin = true;
+
+        window.toggleMode = function () {
+            isLogin = !isLogin;
+            document.getElementById('formTitle').innerHTML = isLogin ? '<i class="ph-fill ph-cloud-sun"></i> Aura' : '<i class="ph-fill ph-sparkle"></i> Join Aura';
+            document.getElementById('formSubtitle').innerText = isLogin ? 'Welcome to your safe space.' : 'Begin your wellbeing journey.';
+            document.getElementById('actionBtn').innerText = isLogin ? 'Sign In' : 'Create Account';
+            document.getElementById('switchBtn').innerText = isLogin ? 'New here? Create an account' : 'Already have an account? Sign in';
+            document.getElementById('errorMsg').innerText = '';
+        }
+
+        window.handleAuth = async function () {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('errorMsg');
+
+            if (!email || !password) {
+                errorDiv.innerText = "Please fill in all fields.";
+                return;
+            }
+
+            if (!auth) {
+                // Mock Success if Firebase API keys aren't entered yet
+                console.log("Mock Auth Success!");
+                window.location.href = "wellbeing-hub.html";
+                return;
+            }
+
+            try {
+                if (isLogin) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                }
+                window.location.href = "wellbeing-hub.html";
+            } catch (error) {
+                console.error(error);
+                // Soft Validation Strings
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                    errorDiv.innerText = "That doesn't match our records. Try again?";
+                } else if (error.code === 'auth/email-already-in-use') {
+                    errorDiv.innerText = "You already have a safe space here. Try signing in!";
+                } else {
+                    errorDiv.innerText = error.message.replace('Firebase:', '').trim();
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
