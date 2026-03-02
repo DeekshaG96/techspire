@@ -569,14 +569,21 @@
 
     <header>
         <div class="greeting">
-            <h1>Hi, Alex <span class="stat-badge"><i class="ph-fill ph-fire"></i> 5</span></h1>
-            <p>Ready to find your center today?</p>
+            <h1 id="greetingTitle">Hi, Friend <span class="stat-badge"><i class="ph-fill ph-fire"></i> <span
+                        id="streakCount">0</span></span></h1>
+            <p id="greetingSub">Ready to find your center today?</p>
         </div>
         <div class="header-actions">
             <!-- Chill Toggle -->
             <button class="chill-toggle" onclick="toggleChill()" id="chillBtn">
                 <i class="ph ph-coffee"></i> Chill
             </button>
+            <!-- Points Badge -->
+            <div class="stat-badge"
+                style="color:var(--sage-green);box-shadow:none;border:1px solid var(--sage-green-light);"
+                title="Zen Points">
+                <i class="ph-fill ph-leaf"></i> <span id="zenPoints">0</span>
+            </div>
             <!-- Overwhelmed SOS -->
             <button class="overwhelmed-btn" onclick="triggerPanicProtocol()">
                 <i class="ph-fill ph-warning-circle"></i> SOS
@@ -626,6 +633,22 @@
                     <div class="card-icon"><i class="ph-duotone ph-palette"></i></div>
                     <h3>Coloring Mandalas</h3>
                     <p>No-wrong-colors digital art</p>
+                </div>
+            </a>
+
+            <a href="focus-tree.html" style="text-decoration:none;" class="card card-games hidden-module">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-tree"></i></div>
+                    <h3>Focus Tree</h3>
+                    <p>Grow a tree with your breath</p>
+                </div>
+            </a>
+
+            <a href="sound-bath.html" style="text-decoration:none;" class="card card-games hidden-module">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-headphones"></i></div>
+                    <h3>Sound Bath</h3>
+                    <p>Mix your own ambient noise</p>
                 </div>
             </a>
         </div>
@@ -855,6 +878,58 @@
             const messagesContainer = document.getElementById('chatMessages');
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
+
+        // Feature 5: International Level Gamification (LocalStorage)
+        function initGamification() {
+            // Check Local Storage
+            if (!localStorage.getItem('zenPoints')) localStorage.setItem('zenPoints', '0');
+            if (!localStorage.getItem('streakCount')) localStorage.setItem('streakCount', '1');
+            if (!localStorage.getItem('lastPlayDate')) localStorage.setItem('lastPlayDate', new Date().toDateString());
+
+            const today = new Date().toDateString();
+            const lastPlay = localStorage.getItem('lastPlayDate');
+            let streak = parseInt(localStorage.getItem('streakCount'));
+
+            // Check if streak is broken (more than 1 day difference)
+            // Simplified check: if not today, it's a new day. Real app needs actual date math.
+            if (today !== lastPlay) {
+                // For prototype, we just increment it.
+                streak += 1;
+                localStorage.setItem('streakCount', streak);
+                localStorage.setItem('lastPlayDate', today);
+            }
+
+            // Update UI
+            document.getElementById('zenPoints').innerText = localStorage.getItem('zenPoints');
+            document.getElementById('streakCount').innerText = streak;
+
+            // Dynamic Greetings
+            const hour = new Date().getHours();
+            let timeGreeting = 'Good evening';
+            if (hour < 12) timeGreeting = 'Good morning';
+            else if (hour < 18) timeGreeting = 'Good afternoon';
+
+            // International Greetings Array
+            const greetings = ["Namaste", "Hola", "Bonjour", "Ciao", "Konnichiwa", "Halo", "Aloha"];
+            const randomGreet = greetings[Math.floor(Math.random() * greetings.length)];
+
+            document.getElementById('greetingTitle').innerHTML = `${timeGreeting} <span class="stat-badge"><i class="ph-fill ph-fire"></i> <span id="streakCount">${streak}</span></span>`;
+
+            // Daily Motivational Quotes
+            const quotes = [
+                "Take a deep breath. You are exactly where you need to be.",
+                "Small steps every day.",
+                "Be kind to your mind today.",
+                "Your energy is your greatest currency.",
+                "Peace begins with a smile.",
+                `${randomGreet}. Ready to find your center?`
+            ];
+            document.getElementById('greetingSub').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        }
+
+        // Run on load
+        window.addEventListener('DOMContentLoaded', initGamification);
+
     </script>
 </body>
 
