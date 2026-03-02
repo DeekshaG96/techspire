@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura - Mental Wellbeing</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            /* Palette: Sage Green, Pastel Lavender, Warm Cream */
+            --bg-cream: #FDFBF7;
+            --sage-green: #9CBFA7;
+            --sage-green-light: #E8F0EA;
+            --pastel-lavender: #E0CBE6;
+            --pastel-lavender-light: #F4EEF6;
+            --text-dark: #373F41;
+            --text-muted: #828B8E;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            --danger-soft: #FFB3B3;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        header {
+            padding: 50px 24px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .greeting h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .greeting p {
+            margin: 4px 0 0 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* The Chill Toggle */
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chill-toggle {
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chill-toggle.active {
+            background: var(--sage-green-light);
+            color: var(--sage-green);
+            border-color: var(--sage-green);
+        }
+
+        /* Overwhelmed Button */
+        .overwhelmed-btn {
+            background: var(--danger-soft);
+            color: #D32F2F;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(211, 47, 47, 0.1);
+        }
+
+        /* Scrollable Content */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 24px 100px;
+            padding-bottom: 120px;
+            /* Space for navbar */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin: 30px 0 16px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .see-all {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Stats (Hidden when Chill Toggle is active) */
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #F5A623;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        body.chill-mode .stat-badge {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        /* Cards Layout */
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 24px 16px;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 160px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:active {
+            transform: scale(0.97);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .card-games .card-icon {
+            background: var(--sage-green-light);
+            color: var(--sage-green);
+        }
+
+        .card-quizzes .card-icon {
+            background: var(--pastel-lavender-light);
+            color: var(--pastel-lavender);
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            margin: 4px 0 0 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Progressive Disclosure: Hidden cards */
+        .card.hidden-module {
+            display: none;
+        }
+
+        .show-all .card.hidden-module {
+            display: flex;
+        }
+
+        /* Large Hero Card */
+        .hero-card {
+            background: linear-gradient(135deg, var(--pastel-lavender-light) 0%, #fff 100%);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 10px;
+        }
+
+        .hero-content h3 {
+            margin: 0 0 8px;
+            font-size: 1.2rem;
+            color: var(--text-dark);
+        }
+
+        .hero-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .hero-btn {
+            background: var(--pastel-lavender);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        /* AI Chatbot Floating Cloud */
+        .chatbot-cloud {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 65px;
+            height: 65px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            z-index: 50;
+            cursor: pointer;
+            color: var(--sage-green);
+            font-size: 2rem;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .chatbot-cloud::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 14px;
+            height: 14px;
+            background: #FF5A5F;
+            border: 2px solid #fff;
+            border-radius: 50%;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(253, 251, 247, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.03);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 10px 15px;
+            /* Account for iOS home indicator */
+            z-index: 40;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+        }
+
+        .nav-item.active {
+            color: var(--sage-green);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            font-size: 1.5rem;
+        }
+
+        /* Breathing Overlay */
+        .breathing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-cream);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .breathing-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .breath-ring {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--sage-green-light) 0%, rgba(156, 191, 167, 0) 70%);
+            border: 2px solid var(--sage-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breathing-overlay.active .breath-ring {
+            animation: breatheAnimation 10s infinite;
+            /* 4 in, 6 out roughly */
+        }
+
+        .breath-text {
+            font-size: 1.5rem;
+            color: var(--sage-green);
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .close-breath {
+            position: absolute;
+            bottom: 50px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        @keyframes breatheAnimation {
+            0% {
+                transform: scale(1);
+            }
+
+            40% {
+                transform: scale(1.6);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="greeting">
+            <h1>Hi, Alex <span class="stat-badge"><i class="ph-fill ph-fire"></i> 5</span></h1>
+            <p>Ready to find your center today?</p>
+        </div>
+        <div class="header-actions">
+            <!-- Chill Toggle -->
+            <button class="chill-toggle" onclick="toggleChill()" id="chillBtn">
+                <i class="ph ph-coffee"></i> Chill
+            </button>
+            <!-- Overwhelmed SOS -->
+            <button class="overwhelmed-btn" onclick="triggerPanicProtocol()">
+                <i class="ph-fill ph-warning-circle"></i> SOS
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- Daily Recommendation -->
+        <div class="hero-card">
+            <div class="hero-content">
+                <h3>The Gratitude Hunt</h3>
+                <p>Find 3 things in your room that bring you joy.</p>
+                <button class="hero-btn">Start 1-Min Quiz</button>
+            </div>
+            <div style="font-size: 4rem; color: var(--pastel-lavender);">
+                <i class="ph-duotone ph-sparkle"></i>
+            </div>
+        </div>
+
+        <!-- Games Section (Minimalist Puzzle) -->
+        <div class="section-header">
+            <h2>Daily Zen Games</h2>
+            <div class="see-all" onclick="toggleAll('games')">See All</div>
+        </div>
+
+        <div class="card-grid" id="games-grid">
+            <a href="antigravity-sink.html" style="text-decoration:none;" class="card card-games">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-aperture"></i></div>
+                    <h3>Viscous Sink</h3>
+                    <p>Tactile sandbox swirling</p>
+                </div>
+            </a>
+
+            <a href="stress-dissolver.html" style="text-decoration:none;" class="card card-games">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-wind"></i></div>
+                    <h3>Breath-Sync</h3>
+                    <p>Matches puzzle to breath</p>
+                </div>
+            </a>
+
+            <!-- Hidden in Progressive Disclosure -->
+            <div class="card card-games hidden-module">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-palette"></i></div>
+                    <h3>Coloring Mandalas</h3>
+                    <p>No-wrong-colors digital art</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quizzes Section (Lightbulb) -->
+        <div class="section-header">
+            <h2>Self-Discovery Quizzes</h2>
+            <div class="see-all" onclick="toggleAll('quizzes')">See All</div>
+        </div>
+
+        <div class="card-grid" id="quizzes-grid">
+            <div class="card card-quizzes">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-lightbulb"></i></div>
+                    <h3>Energy Check-in</h3>
+                    <p>Power nap, walk, or focus?</p>
+                </div>
+            </div>
+
+            <div class="card card-quizzes">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-star"></i></div>
+                    <h3>Identify Strengths</h3>
+                    <p>What are you naturally good at?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot Cloud -->
+    <div class="chatbot-cloud">
+        <i class="ph-duotone ph-cloud-sun"></i>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <i class="ph-fill ph-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="ph ph-puzzle-piece"></i>
+            <span>Games</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="ph ph-exam"></i>
+            <span>Quizzes</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="ph ph-chats-circle"></i>
+            <span>Chat</span>
+        </a>
+    </div>
+
+    <!-- SOS Breathing Overlay -->
+    <div class="breathing-overlay" id="breathingOverlay">
+        <div class="breath-ring">
+            <div class="breath-text" id="breathText">Inhale...</div>
+        </div>
+        <button class="close-breath" onclick="closePanicProtocol()">Exit Session</button>
+    </div>
+
+    <script>
+        // Feature 1: The Chill Toggle
+        function toggleChill() {
+            document.body.classList.toggle('chill-mode');
+            const btn = document.getElementById('chillBtn');
+            btn.classList.toggle('active');
+
+            // Reassuring feedback
+            if (document.body.classList.contains('chill-mode')) {
+                btn.innerHTML = `<i class="ph-fill ph-coffee"></i> Chilling`;
+            } else {
+                btn.innerHTML = `<i class="ph ph-coffee"></i> Chill`;
+            }
+        }
+
+        // Feature 2: Progressive Disclosure
+        function toggleAll(section) {
+            const grid = document.getElementById(`${section}-grid`);
+            grid.classList.toggle('show-all');
+
+            // Find the see-all button and swap text
+            const btn = event.target;
+            if (grid.classList.contains('show-all')) {
+                btn.innerText = "Show Less";
+            } else {
+                btn.innerText = "See All";
+            }
+        }
+
+        // Feature 3: The "I'm Overwhelmed" Button (SOS)
+        let breathInterval;
+
+        function triggerPanicProtocol() {
+            const overlay = document.getElementById('breathingOverlay');
+            overlay.classList.add('active');
+
+            const text = document.getElementById('breathText');
+
+            // Simple Breath Logic (10s cycle: 4 in, 6 out)
+            let cycle = 0;
+            const updateBreath = () => {
+                if (cycle % 2 === 0) {
+                    text.innerText = "Inhale...";
+                } else {
+                    text.innerText = "Exhale slowly...";
+                }
+                cycle++;
+            };
+
+            updateBreath(); // Run immediately
+            // Since the CSS animation is 10s total, we split it approximately
+            breathInterval = setInterval(() => {
+                updateBreath();
+            }, 5000);
+        }
+
+        function closePanicProtocol() {
+            clearInterval(breathInterval);
+            document.getElementById('breathingOverlay').classList.remove('active');
+        }
+    </script>
+</body>
+
+</html>
