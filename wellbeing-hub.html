@@ -1002,7 +1002,7 @@
     </section>
 
     <!-- ================= 2. MAIN HUB (SPA) ================= -->
-    <section id="hubView" style="display: none;">
+    <section id="hubView" style="display: none; width: 100%; height: 100%; flex-direction: column;">
 
         <header>
             <div class="greeting">
@@ -1842,7 +1842,7 @@
 
         window.skipLogin = function () {
             document.getElementById('loginView').style.display = 'none';
-            document.getElementById('hubView').style.display = 'block';
+            document.getElementById('hubView').style.display = 'flex';
 
             // Convert existing Card links into SPA iFrame triggers
             document.querySelectorAll('.card, .hero-btn, .sos-modal-btn.btn-talk').forEach(el => {
