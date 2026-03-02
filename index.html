@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Antigravity - Mental Health Hub</title>
+    <style>
+        :root {
+            --bg-color: #0d0614;
+            --accent-glow: #8e54e9;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f0f0f0;
+            --text-muted: #a0a0a0;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Animated Background Blob */
+        .bg-glow {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(142, 84, 233, 0.15) 0%, rgba(71, 118, 230, 0) 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(60px);
+            z-index: -1;
+            animation: pulse-glow 15s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translate(-50%, -40%) scale(1.3);
+                opacity: 1;
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-top: 10vh;
+            margin-bottom: 5vh;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Glassmorphism Grid */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 90%;
+            max-width: 1000px;
+            z-index: 10;
+            padding-bottom: 5vh;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: skewX(-25deg);
+            transition: all 0.6s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card:hover::before {
+            left: 150%;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 span {
+            font-size: 1.8rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(142, 84, 233, 0.2);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #d1b8ff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            align-self: flex-start;
+            border: 1px solid rgba(142, 84, 233, 0.4);
+        }
+
+        /* Specific Card Gradients */
+        .card-1:hover {
+            box-shadow: 0 10px 40px rgba(255, 126, 95, 0.15);
+            border-color: rgba(255, 126, 95, 0.3);
+        }
+
+        .card-2:hover {
+            box-shadow: 0 10px 40px rgba(0, 200, 255, 0.15);
+            border-color: rgba(0, 200, 255, 0.3);
+        }
+
+        .card-3:hover {
+            box-shadow: 0 10px 40px rgba(160, 232, 207, 0.15);
+            border-color: rgba(160, 232, 207, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .bg-glow {
+                width: 300px;
+                height: 300px;
+            }
+
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-glow"></div>
+
+    <header>
+        <h1>Antigravity</h1>
+        <p class="subtitle">A library of frictionless, alternative UI micro-interventions for sensory overload and acute
+            panic.</p>
+    </header>
+
+    <div class="cards-container">
+        <!-- 1. Antigravity EMDR -->
+        <a href="antigravity-emdr.html" class="card card-1">
+            <h2><span>🧠</span> Bilateral EMDR</h2>
+            <p>For acute panic attacks. Tap alternating left/right zones to rhythmically lower chaos. Features heavy
+                falling stones transitioning to floating orbs, and binaural beats.</p>
+            <div class="badge">Sensory Grounding</div>
+        </a>
+
+        <!-- 2. Antigravity Sink -->
+        <a href="antigravity-sink.html" class="card card-2">
+            <h2><span>🪩</span> Viscous Sink</h2>
+            <p>For frustration / restlessness. Swirl the glowing metaball fluid to initiate a centripetal calming
+                vortex. Features a hardware shake-to-reset integration.</p>
+            <div class="badge">Tactile Flow</div>
+        </a>
+
+        <!-- 3. Stress Dissolver -->
+        <a href="stress-dissolver.html" class="card card-3">
+            <h2><span>🌀</span> Orbital Dissolver</h2>
+            <p>For physical tension. Gather erratic particles into a smooth, heavy orbit. Triggers a 6-BPM clinical
+                resonance breathing intervention with Brownian noise.</p>
+            <div class="badge">Resonance Breathing</div>
+        </a>
+    </div>
+
+</body>
+
+</html>
