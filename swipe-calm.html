@@ -271,7 +271,8 @@
             const handleMove = (e) => {
                 if (!isDragging) return;
                 currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-                let diff = currentX - startX;
+                let rawDiff = currentX - startX;
+                let diff = rawDiff * 0.45; // Increased friction: makes the toss feel heavier and more intentional
                 // Add slight resistance and rotation
                 bubble.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`;
             };
@@ -295,9 +296,10 @@
         }
 
         function handleSwipe(bubble, start, end) {
-            let diff = end - start;
+            let rawDiff = end - start;
+            let diff = rawDiff * 0.45; // Apply the same friction on release calculations
 
-            if (Math.abs(diff) > 80) {
+            if (Math.abs(diff) > 120) { // Increased threshold to require a very intentional fling
                 // Swiped successfully
                 if (diff > 0) {
                     bubble.classList.add("fade-out"); // Right
@@ -309,12 +311,15 @@
                     showQuickMotivation();
                 }
 
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]); // Heavy haptic feedback upon successful fling
+
                 setTimeout(() => {
                     bubble.remove();
                     checkReset();
                 }, 400);
             } else {
-                // Return to center
+                // Return to center (snaps back intentionally due to high friction simulation)
+                if (navigator.vibrate) navigator.vibrate([20]); // Gentle snap feedback
                 bubble.style.transform = `translateX(0px) rotate(0deg)`;
             }
         }

@@ -436,6 +436,55 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        .chat-modal.deep-journal {
+            width: 90vw;
+            max-width: 900px;
+            height: 85vh;
+            max-height: 800px;
+            bottom: 50vh;
+            right: 50vw;
+            transform: translate(50%, 50%) scale(1) !important;
+            flex-direction: row;
+            /* Split screen setup */
+        }
+
+        .chat-modal.deep-journal .chat-sidebar {
+            display: block !important;
+        }
+
+        .chat-sidebar {
+            display: none;
+            width: 300px;
+            background: #F4EEF6;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-sidebar h4 {
+            margin-top: 0;
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .memory-chunk {
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            color: #555;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+
+        .chat-main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
         .chat-modal.active {
             transform: translateY(0) scale(1);
             opacity: 1;
@@ -689,572 +738,1198 @@
             cursor: pointer;
             margin-top: 10px;
         }
+
+        /* SPA ARCHITECTURE CSS */
+        #loginView,
+        #hubView {
+            transition: opacity 0.4s ease;
+        }
+
+        .login-super-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #020205;
+            /* Dark base for lava lamp */
+            width: 100%;
+            position: absolute;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        /* 🌋 CSS Lava Lamp Blobs */
+        .lava-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.6;
+            animation: floatLava 15s infinite infinite cubic-bezier(0.4, 0, 0.2, 1) alternate;
+            z-index: -1;
+        }
+
+        .lava-1 {
+            width: 400px;
+            height: 400px;
+            background: #9B86BD;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .lava-2 {
+            width: 500px;
+            height: 500px;
+            background: #DFB6B2;
+            bottom: 10%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .lava-3 {
+            width: 350px;
+            height: 350px;
+            background: #A2C4C9;
+            top: 40%;
+            left: 60%;
+            animation-delay: -10s;
+        }
+
+        @keyframes floatLava {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30%, -20%) scale(1.2);
+            }
+
+            66% {
+                transform: translate(-20%, 20%) scale(0.9);
+            }
+
+            100% {
+                transform: translate(10%, 10%) scale(1.1);
+            }
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            text-align: center;
+            color: #4A4A4A;
+        }
+
+        .login-box h2 {
+            margin-top: 0;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-box p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0 20px 0;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.4);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .login-box .btn-primary {
+            background: #9B86BD;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.4s ease;
+        }
+
+        /* 🌊 Breathing Orb Loader */
+        .btn-primary.breathing-loader {
+            width: 50px !important;
+            height: 50px !important;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            color: transparent !important;
+            margin: 0 auto;
+            position: relative;
+            background: radial-gradient(circle, #DFB6B2 0%, #9B86BD 100%);
+            box-shadow: 0 0 20px rgba(155, 134, 189, 0.4);
+            animation: breatheOrb 4s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .btn-wrapper {
+            text-align: center;
+            min-height: 50px;
+        }
+
+        @keyframes breatheOrb {
+            0% {
+                transform: scale(0.8);
+                box-shadow: 0 0 10px rgba(155, 134, 189, 0.2);
+            }
+
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 0 30px rgba(223, 182, 178, 0.8);
+                background: radial-gradient(circle, #A2C4C9 0%, #DFB6B2 100%);
+            }
+
+            100% {
+                transform: scale(0.8);
+                box-shadow: 0 0 10px rgba(155, 134, 189, 0.2);
+            }
+        }
+
+        .login-box .error-msg {
+            color: #ffcccc;
+            min-height: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .login-box .switch-mode {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: white;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        #appViewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #fff;
+            z-index: 9999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(20px);
+        }
+
+        #appViewer.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #appViewer iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-app-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            color: #333;
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10000;
+            transition: transform 0.2s;
+        }
+
+        .close-app-btn:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <div class="greeting">
-            <h1 id="greetingTitle">Hi, Friend <span class="stat-badge"><i class="ph-fill ph-fire"></i> <span
-                        id="streakCount">0</span></span></h1>
-            <p id="greetingSub">Ready to find your center today?</p>
-        </div>
-        <div class="header-actions">
-            <!-- Chill Toggle -->
-            <button class="chill-toggle" onclick="toggleChill()" id="chillBtn">
-                <i class="ph ph-coffee"></i> Chill
-            </button>
-            <!-- Points Badge -->
-            <div class="stat-badge"
-                style="color:var(--sage-green);box-shadow:none;border:1px solid var(--sage-green-light);"
-                title="Zen Points">
-                <i class="ph-fill ph-leaf"></i> <span id="zenPoints">0</span>
-            </div>
-            <!-- Overwhelmed SOS -->
-            <button class="overwhelmed-btn" onclick="triggerPanicProtocol()">
-                <i class="ph-fill ph-warning-circle"></i> SOS
-            </button>
-        </div>
-    </header>
+    <!-- ================= 1. LOGIN PORTAL (SPA) ================= -->
+    <section id="loginView" class="login-super-container">
+        <!-- Lava Lamp Background Effect -->
+        <div class="lava-blob lava-1"></div>
+        <div class="lava-blob lava-2"></div>
+        <div class="lava-blob lava-3"></div>
 
-    <div class="content">
-        <!-- Daily Recommendation -->
-        <div class="hero-card">
-            <div class="hero-content">
-                <h3>The Gratitude Hunt</h3>
-                <p>Find 3 things in your room that bring you joy.</p>
-                <button class="hero-btn" onclick="window.location.href='gratitude-hunt.html'">Start 1-Min Quiz</button>
+        <div class="login-box">
+            <h2 id="formTitle"><i class="ph-fill ph-cloud-sun"></i> Aura</h2>
+            <p id="formSubtitle">Welcome to your safe space.</p>
+            <div class="error-msg" id="errorMsg"></div>
+            <input type="email" id="emailInput" placeholder="Email address" required>
+            <input type="password" id="passwordInput" placeholder="Password" required>
+
+            <div class="btn-wrapper">
+                <button class="btn-primary" id="actionBtn" onclick="handleAuth()">Sign In</button>
             </div>
-            <div style="font-size: 4rem; color: var(--pastel-lavender);">
-                <i class="ph-duotone ph-sparkle"></i>
+
+            <div class="switch-mode" id="switchBtn" onclick="toggleMode()">New here? Create an account</div>
+            <div style="margin-top: 25px; font-size: 0.8rem;">
+                <a href="#" onclick="skipLogin()" style="color: rgba(255,255,255,0.7); text-decoration: none;">Skip to
+                    Hub (Guest Mode)</a>
             </div>
         </div>
+    </section>
 
-        <!-- Achievement Shelf -->
-        <div class="shelf-container">
-            <div class="shelf-header"><i class="ph-duotone ph-medal" style="color:#F5A623;"></i> Zen Achievements</div>
-            <div class="badges-grid" id="badgesGrid">
-                <div class="badge" id="badge-1">
-                    <div class="badge-icon">🌱</div>
-                    <div class="badge-name">First Step</div>
+    <!-- ================= 2. MAIN HUB (SPA) ================= -->
+    <section id="hubView" style="display: none;">
+
+        <header>
+            <div class="greeting">
+                <h1 id="greetingTitle">Hi, Friend <span class="stat-badge"><i class="ph-fill ph-fire"></i> <span
+                            id="streakCount">0</span></span></h1>
+                <p id="greetingSub">Ready to find your center today?</p>
+            </div>
+            <div class="header-actions">
+                <!-- Chill Toggle -->
+                <button class="chill-toggle" onclick="toggleChill()" id="chillBtn">
+                    <i class="ph ph-coffee"></i> Chill
+                </button>
+                <!-- Points Badge -->
+                <div class="stat-badge"
+                    style="color:var(--sage-green);box-shadow:none;border:1px solid var(--sage-green-light);"
+                    title="Zen Points">
+                    <i class="ph-fill ph-leaf"></i> <span id="zenPoints">0</span>
                 </div>
-                <div class="badge" id="badge-10">
-                    <div class="badge-icon">🌿</div>
-                    <div class="badge-name">10 Points</div>
+                <!-- Overwhelmed SOS -->
+                <button class="overwhelmed-btn" onclick="triggerPanicProtocol()">
+                    <i class="ph-fill ph-warning-circle"></i> SOS
+                </button>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Daily Recommendation -->
+            <div class="hero-card">
+                <div class="hero-content">
+                    <h3>The Gratitude Hunt</h3>
+                    <p>Find 3 things in your room that bring you joy.</p>
+                    <button class="hero-btn" onclick="window.location.href='gratitude-hunt.html'">Start 1-Min
+                        Quiz</button>
                 </div>
-                <div class="badge" id="badge-50">
-                    <div class="badge-icon">🌳</div>
-                    <div class="badge-name">Zen Master(50)</div>
+                <div style="font-size: 4rem; color: var(--pastel-lavender);">
+                    <i class="ph-duotone ph-sparkle"></i>
                 </div>
-                <div class="badge" id="badge-streak">
-                    <div class="badge-icon">🔥</div>
-                    <div class="badge-name">3 Day Streak</div>
+            </div>
+
+            <!-- Achievement Shelf -->
+            <div class="shelf-container">
+                <div class="shelf-header"><i class="ph-duotone ph-medal" style="color:#F5A623;"></i> Zen Achievements
                 </div>
+                <div class="badges-grid" id="badgesGrid">
+                    <div class="badge" id="badge-1">
+                        <div class="badge-icon">🌱</div>
+                        <div class="badge-name">First Step</div>
+                    </div>
+                    <div class="badge" id="badge-10">
+                        <div class="badge-icon">🌿</div>
+                        <div class="badge-name">10 Points</div>
+                    </div>
+                    <div class="badge" id="badge-50">
+                        <div class="badge-icon">🌳</div>
+                        <div class="badge-name">Zen Master(50)</div>
+                    </div>
+                    <div class="badge" id="badge-streak">
+                        <div class="badge-icon">🔥</div>
+                        <div class="badge-name">3 Day Streak</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Games Section (Minimalist Puzzle) -->
+            <div class="section-header">
+                <h2>Daily Zen Games</h2>
+                <div class="see-all" onclick="toggleAll('games')">See All</div>
+            </div>
+
+            <div class="card-grid" id="games-grid">
+                <a href="#" onclick="launchApp('antigravity-cmdr.html', event)" style="text-decoration:none;"
+                    class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-anchor" style="color:#FF7E5F;"></i></div>
+                        <h3>Gravity Anchor</h3>
+                        <p>Stop frantic scrolling</p>
+                    </div>
+                </a>
+
+                <a href="#" onclick="launchApp('antigravity-sink.html', event)" style="text-decoration:none;"
+                    class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-aperture"></i></div>
+                        <h3>Viscous Sink</h3>
+                        <p>Tactile sandbox swirling</p>
+                    </div>
+                </a>
+
+                <a href="stress-dissolver.html" style="text-decoration:none;" class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-wind"></i></div>
+                        <h3>Breath-Sync</h3>
+                        <p>Matches puzzle to breath</p>
+                    </div>
+                </a>
+
+                <!-- Hidden in Progressive Disclosure -->
+                <a href="mandala-coloring.html" style="text-decoration:none;" class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-palette"></i></div>
+                        <h3>Coloring Mandalas</h3>
+                        <p>No-wrong-colors digital art</p>
+                    </div>
+                </a>
+
+                <a href="focus-tree.html" style="text-decoration:none;" class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-tree"></i></div>
+                        <h3>Focus Tree</h3>
+                        <p>Grow a tree with your breath</p>
+                    </div>
+                </a>
+
+                <a href="sound-bath.html" style="text-decoration:none;" class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-headphones"></i></div>
+                        <h3>Sound Bath</h3>
+                        <p>Mix your own ambient noise</p>
+                    </div>
+                </a>
+
+                <a href="bubble-pop.html" style="text-decoration:none;" class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-drop"></i></div>
+                        <h3>Bubble Pop</h3>
+                        <p>Gamified mindful breathing</p>
+                    </div>
+                </a>
+
+                <a href="mood-jar.html" style="text-decoration:none;" class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-jar"></i></div>
+                        <h3>Daily Mood Jar</h3>
+                        <p>Physics-based tracker</p>
+                    </div>
+                </a>
+
+                <a href="swipe-calm.html" style="text-decoration:none;" class="card card-games">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-hand-swipe-right"></i></div>
+                        <h3>SwipeCalm</h3>
+                        <p>Swipe away negative thoughts</p>
+                    </div>
+                </a>
+
+                <a href="#" onclick="launchApp('webcam-stress.html', event)" style="text-decoration:none;"
+                    class="card card-games" style="border-top: 1px solid rgba(155, 134, 189, 0.3);">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-scan" style="color:#9B86BD;"></i></div>
+                        <h3>Deep Vision</h3>
+                        <p>Webcam Stress AI</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Quizzes Section (Lightbulb) -->
+            <div class="section-header">
+                <h2>Self-Discovery Quizzes</h2>
+                <div class="see-all" onclick="toggleAll('quizzes')">See All</div>
+            </div>
+
+            <div class="card-grid" id="quizzes-grid">
+                <a href="energy-checkin.html" style="text-decoration:none;" class="card card-quizzes">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-lightbulb"></i></div>
+                        <h3>Energy Check-in</h3>
+                        <p>Power nap, walk, or focus?</p>
+                    </div>
+                </a>
+
+                <a href="strengths-quiz.html" style="text-decoration:none;" class="card card-quizzes">
+                    <div>
+                        <div class="card-icon"><i class="ph-duotone ph-star"></i></div>
+                        <h3>Identify Strengths</h3>
+                        <p>What are you naturally good at?</p>
+                    </div>
+                </a>
             </div>
         </div>
 
-        <!-- Games Section (Minimalist Puzzle) -->
-        <div class="section-header">
-            <h2>Daily Zen Games</h2>
-            <div class="see-all" onclick="toggleAll('games')">See All</div>
+        <!-- AI Chatbot Cloud -->
+        <div class="chatbot-cloud">
+            <i class="ph-duotone ph-cloud-sun"></i>
         </div>
 
-        <div class="card-grid" id="games-grid">
-            <a href="antigravity-sink.html" style="text-decoration:none;" class="card card-games">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-aperture"></i></div>
-                    <h3>Viscous Sink</h3>
-                    <p>Tactile sandbox swirling</p>
-                </div>
+        <!-- Bottom Nav -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <i class="ph-fill ph-house"></i>
+                <span>Home</span>
             </a>
-
-            <a href="stress-dissolver.html" style="text-decoration:none;" class="card card-games">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-wind"></i></div>
-                    <h3>Breath-Sync</h3>
-                    <p>Matches puzzle to breath</p>
-                </div>
+            <a href="#games-grid" class="nav-item">
+                <i class="ph ph-puzzle-piece"></i>
+                <span>Games</span>
             </a>
-
-            <!-- Hidden in Progressive Disclosure -->
-            <a href="mandala-coloring.html" style="text-decoration:none;" class="card card-games">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-palette"></i></div>
-                    <h3>Coloring Mandalas</h3>
-                    <p>No-wrong-colors digital art</p>
-                </div>
+            <a href="#quizzes-grid" class="nav-item">
+                <i class="ph ph-exam"></i>
+                <span>Quizzes</span>
             </a>
-
-            <a href="focus-tree.html" style="text-decoration:none;" class="card card-games">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-tree"></i></div>
-                    <h3>Focus Tree</h3>
-                    <p>Grow a tree with your breath</p>
-                </div>
-            </a>
-
-            <a href="sound-bath.html" style="text-decoration:none;" class="card card-games">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-headphones"></i></div>
-                    <h3>Sound Bath</h3>
-                    <p>Mix your own ambient noise</p>
-                </div>
-            </a>
-
-            <a href="bubble-pop.html" style="text-decoration:none;" class="card card-games">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-drop"></i></div>
-                    <h3>Bubble Pop</h3>
-                    <p>Gamified mindful breathing</p>
-                </div>
-            </a>
-
-            <a href="mood-jar.html" style="text-decoration:none;" class="card card-games">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-jar"></i></div>
-                    <h3>Daily Mood Jar</h3>
-                    <p>Physics-based tracker</p>
-                </div>
-            </a>
-
-            <a href="swipe-calm.html" style="text-decoration:none;" class="card card-games">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-hand-swipe-right"></i></div>
-                    <h3>SwipeCalm</h3>
-                    <p>Swipe away negative thoughts</p>
-                </div>
+            <a href="#" class="nav-item" onclick="toggleChat()">
+                <i class="ph ph-chats-circle"></i>
+                <span>Chat</span>
             </a>
         </div>
 
-        <!-- Quizzes Section (Lightbulb) -->
-        <div class="section-header">
-            <h2>Self-Discovery Quizzes</h2>
-            <div class="see-all" onclick="toggleAll('quizzes')">See All</div>
-        </div>
-
-        <div class="card-grid" id="quizzes-grid">
-            <a href="energy-checkin.html" style="text-decoration:none;" class="card card-quizzes">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-lightbulb"></i></div>
-                    <h3>Energy Check-in</h3>
-                    <p>Power nap, walk, or focus?</p>
-                </div>
-            </a>
-
-            <a href="strengths-quiz.html" style="text-decoration:none;" class="card card-quizzes">
-                <div>
-                    <div class="card-icon"><i class="ph-duotone ph-star"></i></div>
-                    <h3>Identify Strengths</h3>
-                    <p>What are you naturally good at?</p>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <!-- AI Chatbot Cloud -->
-    <div class="chatbot-cloud">
-        <i class="ph-duotone ph-cloud-sun"></i>
-    </div>
-
-    <!-- Bottom Nav -->
-    <div class="bottom-nav">
-        <a href="#" class="nav-item active">
-            <i class="ph-fill ph-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="#games-grid" class="nav-item">
-            <i class="ph ph-puzzle-piece"></i>
-            <span>Games</span>
-        </a>
-        <a href="#quizzes-grid" class="nav-item">
-            <i class="ph ph-exam"></i>
-            <span>Quizzes</span>
-        </a>
-        <a href="#" class="nav-item" onclick="toggleChat()">
-            <i class="ph ph-chats-circle"></i>
-            <span>Chat</span>
-        </a>
-    </div>
-
-    <!-- SOS Breathing Overlay -->
-    <div class="breathing-overlay" id="breathingOverlay">
-        <div class="breath-ring">
-            <div class="breath-text" id="breathText">Inhale...</div>
-        </div>
-        <button class="close-breath" onclick="closePanicProtocol()">Exit Session</button>
-    </div>
-
-    <!-- SOS Dual Choice Modal -->
-    <div class="sos-modal" id="sosModal">
-        <h2 style="margin-bottom: 30px; font-size: 1.8rem;">How can we help?</h2>
-        <button class="sos-modal-btn btn-breathe" onclick="startBreathingSession()"><i class="ph-fill ph-wind"></i>
-            Breathe with me</button>
-        <button class="sos-modal-btn btn-talk" onclick="window.location.href='crisis-hotlines.html'"><i
-                class="ph-fill ph-phone"></i> I need to talk to someone</button>
-        <button class="btn-cancel"
-            onclick="document.getElementById('sosModal').classList.remove('active')">Cancel</button>
-    </div>
-
-    <!-- Chatbot Modal -->
-    <div class="chat-modal" id="chatModal">
-        <div class="chat-header">
-            <h3><i class="ph-fill ph-cloud-sun" style="color:var(--sage-green);"></i> Aura Helper</h3>
-            <div>
-                <button class="close-chat" onclick="toggleChatSettings()" style="margin-right: 10px;"
-                    title="API Keys & Settings"><i class="ph ph-gear"></i></button>
-                <button class="close-chat" onclick="toggleChat()"><i class="ph ph-x"></i></button>
+        <!-- SOS Breathing Overlay -->
+        <div class="breathing-overlay" id="breathingOverlay">
+            <div class="breath-ring">
+                <div class="breath-text" id="breathText">Inhale...</div>
             </div>
+            <button class="close-breath" onclick="closePanicProtocol()">Exit Session</button>
         </div>
-        <!-- Settings Panel -->
-        <div class="chat-settings" id="chatSettings"
-            style="display:none; padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee;">
-            <p style="margin: 0 0 10px 0; font-weight: 600; color: #444; font-size: 0.9rem;">1. Select AI Model</p>
-            <select id="aiProvider" onchange="saveChatSettings()"
-                style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; margin-bottom: 15px;">
-                <optgroup label="Best Performance (2026)">
-                    <option value="gemini-3-flash-preview">Google Gemini 3 Flash</option>
-                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                </optgroup>
-                <optgroup label="Budget & Speed">
-                    <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Lite</option>
-                </optgroup>
-                <optgroup label="Open Weights">
-                    <option value="huggingface">Hugging Face (Mistral 7B)</option>
-                </optgroup>
-            </select>
-            <p style="margin: 0 0 5px 0; font-weight: 600; color: #444; font-size: 0.9rem;">2. Enter Active API Key</p>
-            <input type="password" id="aiApiKey" placeholder="Enter API Key/Token" onchange="saveChatSettings()"
-                style="width: 100%; box-sizing:border-box; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit;">
-            <p style="font-size: 0.75rem; color: #777; margin-top: 8px; line-height: 1.3;">Your key is encrypted in your
-                device's <b>local storage</b> and is entirely hidden from GitHub.</p>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="msg bot">Hi Alex! I'm here if you need to talk, vent, or just want a distraction. How are you
-                feeling right now?</div>
-            <div class="typing-indicator" id="typingIndicator">Aura is typing...</div>
-        </div>
-        <div class="chat-input-area">
-            <input type="text" id="chatInput" placeholder="I'm feeling a bit anxious..."
-                onkeypress="handleKeyPress(event)">
-            <button class="chat-send" onclick="sendMessage()"><i class="ph-fill ph-paper-plane-right"></i></button>
-        </div>
-    </div>
 
-    <script>
-        // Feature 1: The Chill Toggle
-        function toggleChill() {
-            document.body.classList.toggle('chill-mode');
-            const btn = document.getElementById('chillBtn');
-            btn.classList.toggle('active');
+        <!-- SOS Dual Choice Modal -->
+        <div class="sos-modal" id="sosModal">
+            <h2 style="margin-bottom: 30px; font-size: 1.8rem;">How can we help?</h2>
+            <button class="sos-modal-btn btn-breathe" onclick="startBreathingSession()"><i class="ph-fill ph-wind"></i>
+                Breathe with me</button>
+            <button class="sos-modal-btn btn-talk" onclick="window.location.href='crisis-hotlines.html'"><i
+                    class="ph-fill ph-phone"></i> I need to talk to someone</button>
+            <button class="btn-cancel"
+                onclick="document.getElementById('sosModal').classList.remove('active')">Cancel</button>
+        </div>
 
-            // Reassuring feedback
-            if (document.body.classList.contains('chill-mode')) {
-                btn.innerHTML = `<i class="ph-fill ph-coffee"></i> Chilling`;
-            } else {
-                btn.innerHTML = `<i class="ph ph-coffee"></i> Chill`;
+        <!-- Chatbot Modal -->
+        <div class="chat-modal" id="chatModal">
+            <div class="chat-header">
+                <h3><i class="ph-fill ph-cloud-sun" style="color:var(--sage-green);"></i> Aura Helper</h3>
+                <div>
+                    <button class="close-chat" onclick="toggleDeepJournal()" style="margin-right: 10px;"
+                        title="Deep Journal Mode"><i class="ph-duotone ph-arrows-out"></i></button>
+                    <button class="close-chat" onclick="toggleChatSettings()" style="margin-right: 10px;"
+                        title="API Keys & Settings"><i class="ph ph-gear"></i></button>
+                    <button class="close-chat" onclick="toggleChat()"><i class="ph ph-x"></i></button>
+                </div>
+            </div>
+
+            <div class="chat-sidebar" id="chatSidebar">
+                <h4><i class="ph-duotone ph-brain"></i> RAG Memory bank</h4>
+                <p style="font-size: 0.75rem; color: #888;">Aura automatically remembers the context of your past
+                    thoughts using a local vector logic system.</p>
+                <div id="memoryContainer"></div>
+            </div>
+
+            <div class="chat-main-area">
+                <!-- Settings Panel -->
+                <div class="chat-settings" id="chatSettings"
+                    style="display:none; padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee;">
+                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #444; font-size: 0.9rem;">1. Select AI Model
+                    </p>
+                    <select id="aiProvider" onchange="saveChatSettings()"
+                        style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; margin-bottom: 15px;">
+                        <optgroup label="Best Performance (2026)">
+                            <option value="gemini-3-flash-preview">Google Gemini 3 Flash</option>
+                            <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                        </optgroup>
+                        <optgroup label="Budget & Speed">
+                            <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Lite</option>
+                        </optgroup>
+                        <optgroup label="Open Weights">
+                            <option value="huggingface">Hugging Face (Mistral 7B)</option>
+                        </optgroup>
+                        <optgroup label="True Offline Privacy">
+                            <option value="ollama">Localhost Ollama (Phi/Mistral)</option>
+                        </optgroup>
+                    </select>
+                    <p style="margin: 0 0 5px 0; font-weight: 600; color: #444; font-size: 0.9rem;">2. Enter Active API
+                        Key
+                        (Leave blank if Ollama)
+                        <input type="password" id="aiApiKey" placeholder="Enter API Key/Token"
+                            onchange="saveChatSettings()"
+                            style="width: 100%; box-sizing:border-box; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit;">
+                    <p style="font-size: 0.75rem; color: #777; margin-top: 8px; line-height: 1.3;">Your key is encrypted
+                        in
+                        your device's <b>local storage</b> and is entirely hidden from GitHub.</p>
+                    <div style="margin-top: 15px; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="qualityModeToggle" onchange="saveChatSettings()"
+                            style="width: auto; margin: 0;">
+                        <label for="qualityModeToggle" style="font-size: 0.9rem; font-weight: 600; color: #444;">Enable
+                            Deep
+                            Insight (Quality Mode)</label>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #777; margin-top: 5px; line-height: 1.3;">Multi-step AI logic
+                        for
+                        psychological accuracy. Slower but profound.</p>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="msg bot">Hi Alex! I'm here if you need to talk, vent, or just want a distraction. How
+                        are
+                        you
+                        feeling right now?</div>
+                    <div class="typing-indicator" id="typingIndicator">Aura is typing...</div>
+                </div>
+                <div class="chat-input-area">
+                    <textarea id="chatInput" placeholder="I'm feeling a bit anxious... (Shift+Enter for new line)"
+                        onkeypress="handleKeyPress(event)"
+                        style="flex:1; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 10px 16px; font-size: 0.9rem; outline: none; font-family: inherit; resize: none; min-height: 40px; max-height: 120px;"></textarea>
+                    <button class="chat-send" onclick="sendMessage()" style="align-self: flex-end;"><i
+                            class="ph-fill ph-paper-plane-right"></i></button>
+                </div>
+            </div> <!-- End of chat-main-area -->
+        </div>
+
+        <script>
+            function toggleDeepJournal() {
+                const modal = document.getElementById('chatModal');
+                modal.classList.toggle('deep-journal');
+
+                if (modal.classList.contains('deep-journal')) {
+                    // Load memory chunks into sidebar
+                    let memory = JSON.parse(localStorage.getItem('aura_rag_memory') || '[]');
+                    const container = document.getElementById('memoryContainer');
+                    container.innerHTML = '';
+                    if (memory.length === 0) container.innerHTML = '<div class="memory-chunk">No memories stored yet. Talk to Aura to build the local vector graph!</div>';
+
+                    memory.forEach(m => {
+                        if (m.role === 'user') {
+                            container.innerHTML += `<div class="memory-chunk"><b>You:</b> ${m.text}</div>`;
+                        } else {
+                            container.innerHTML += `<div class="memory-chunk" style="background:#eaf2ec;"><b>Aura:</b> ${m.text.substring(0, 60)}...</div>`;
+                        }
+                    });
+                }
             }
-        }
+            // Feature 1: The Chill Toggle
+            function toggleChill() {
+                document.body.classList.toggle('chill-mode');
+                const btn = document.getElementById('chillBtn');
+                btn.classList.toggle('active');
 
-        // Feature 2: Progressive Disclosure
-        function toggleAll(section) {
-            const grid = document.getElementById(`${section}-grid`);
-            grid.classList.toggle('show-all');
-
-            // Find the see-all button and swap text
-            const btn = event.target;
-            if (grid.classList.contains('show-all')) {
-                btn.innerText = "Show Less";
-            } else {
-                btn.innerText = "See All";
-            }
-        }
-
-        // Feature 3: The "I'm Overwhelmed" Button (SOS)
-        let breathInterval;
-
-        function triggerPanicProtocol() {
-            document.getElementById('sosModal').classList.add('active');
-        }
-
-        function startBreathingSession() {
-            document.getElementById('sosModal').classList.remove('active');
-            const overlay = document.getElementById('breathingOverlay');
-            overlay.classList.add('active');
-
-            const text = document.getElementById('breathText');
-
-            // Simple Breath Logic (10s cycle: 4 in, 6 out)
-            let cycle = 0;
-            const updateBreath = () => {
-                if (cycle % 2 === 0) {
-                    text.innerText = "Inhale...";
+                // Reassuring feedback
+                if (document.body.classList.contains('chill-mode')) {
+                    btn.innerHTML = `<i class="ph-fill ph-coffee"></i> Chilling`;
                 } else {
-                    text.innerText = "Exhale slowly...";
+                    btn.innerHTML = `<i class="ph ph-coffee"></i> Chill`;
                 }
-                cycle++;
-            };
-
-            updateBreath(); // Run immediately
-            // Since the CSS animation is 10s total, we split it approximately
-            breathInterval = setInterval(() => {
-                updateBreath();
-            }, 5000);
-        }
-
-        function closePanicProtocol() {
-            clearInterval(breathInterval);
-            document.getElementById('breathingOverlay').classList.remove('active');
-        }
-
-        // Feature 4: AI Chatbot (Secure Dual-Provider Integration)
-        const SYSTEM_INSTRUCTION = "You are Aura, an empathetic, friendly, and brief mental wellbeing helper. Do not give medical advice. If a user is overwhelmed, suggest using the SOS button or breathing exercises. Keep responses short (1-2 sentences).";
-
-        let chatHistory = [];
-
-        function toggleChatSettings() {
-            const settings = document.getElementById('chatSettings');
-            settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function saveChatSettings() {
-            const provider = document.getElementById('aiProvider').value;
-            const key = document.getElementById('aiApiKey').value.trim();
-            if (key) {
-                localStorage.setItem('aura_ai_provider', provider);
-                localStorage.setItem('aura_ai_key', key);
-            }
-        }
-
-        function loadChatSettings() {
-            const provider = localStorage.getItem('aura_ai_provider') || 'gemini-3-flash-preview';
-            const key = localStorage.getItem('aura_ai_key') || '';
-            document.getElementById('aiProvider').value = provider;
-            document.getElementById('aiApiKey').value = key;
-        }
-
-        // Bind cloud click to open chat
-        document.querySelector('.chatbot-cloud').addEventListener('click', () => {
-            toggleChat();
-            loadChatSettings();
-        });
-
-        function toggleChat() {
-            const modal = document.getElementById('chatModal');
-            modal.classList.toggle('active');
-            if (modal.classList.contains('active')) {
-                document.getElementById('chatInput').focus();
-            }
-        }
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        // --- Offline CalmTalk Logic ---
-        function offlineBotReply(text) {
-            text = text.toLowerCase();
-            let reply = "Thank you for sharing. You're not alone.";
-
-            if (text.includes("stress") || text.includes("pressure")) {
-                reply = "It sounds like you're under a lot of pressure. Try taking things one step at a time. Even small breaks help. 🌿";
-            }
-            else if (text.includes("anxious") || text.includes("anxiety")) {
-                reply = "Feeling anxious can be really uncomfortable. Let's slow your breathing for a moment. You are safe right now. 🤍";
-            }
-            else if (text.includes("panic")) {
-                reply = "Panic can feel intense, but it will pass. Try to focus on something you can see or touch around you. I'm right here.";
-            }
-            else if (text.includes("tired") || text.includes("exhausted")) {
-                reply = "It sounds like you've been doing a lot. Rest is not laziness—it's necessary. Please get some sleep soon. 🌙";
-            }
-            else if (text.includes("sad") || text.includes("down")) {
-                reply = "I hear that you're feeling low. Your feelings matter, and it's okay to feel this way. 🌧️";
-            }
-            else {
-                reply = "I'm listening. You're doing your best, and that's enough for now. 🤍";
-            }
-            return reply;
-        }
-
-        async function sendMessage() {
-            const inputField = document.getElementById('chatInput');
-            const message = inputField.value.trim();
-            if (!message) return;
-
-            const provider = localStorage.getItem('aura_ai_provider') || 'gemini-3-flash-preview';
-            const apiKey = localStorage.getItem('aura_ai_key');
-
-            // 1. Display User Message
-            addMessageToUI(message, 'user');
-            inputField.value = '';
-
-            // 2. Show Typing Indicator
-            const typingIndicator = document.getElementById('typingIndicator');
-            typingIndicator.style.display = 'block';
-            scrollChatToBottom();
-
-            // Append to internal history structure
-            chatHistory.push({ role: "user", parts: [{ text: message }] });
-
-            // 3. Fallback to Offline CalmTalk if NO API KEY is present
-            if (!apiKey) {
-                setTimeout(() => {
-                    typingIndicator.style.display = 'none';
-                    const fallbackReply = offlineBotReply(message);
-                    addMessageToUI(fallbackReply, 'bot');
-
-                    // Add gentle nudge to settings occasionally
-                    if (Math.random() > 0.7) {
-                        setTimeout(() => { addMessageToUI("*(P.S. To unlock advanced AI conversation, click the ⚙️ gear icon and add your key!)*", 'bot'); }, 1000);
-                    }
-                }, 800);
-                return;
             }
 
-            // 4. Call AI Provider (If Key Exists)
-            try {
-                if (provider.startsWith('gemini')) {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${provider}:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-                            contents: chatHistory
-                        })
-                    });
-                    const data = await response.json();
-                    typingIndicator.style.display = 'none';
+            // Feature 2: Progressive Disclosure
+            function toggleAll(section) {
+                const grid = document.getElementById(`${section}-grid`);
+                grid.classList.toggle('show-all');
 
-                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                        const botReply = data.candidates[0].content.parts[0].text;
-                        addMessageToUI(botReply, 'bot');
-                        chatHistory.push({ role: "model", parts: [{ text: botReply }] });
-                    } else if (data.error) {
-                        addMessageToUI(`SYSTEM ERROR: Google API rejected the key. Reason: ${data.error.message}`, 'bot');
+                // Find the see-all button and swap text
+                const btn = event.target;
+                if (grid.classList.contains('show-all')) {
+                    btn.innerText = "Show Less";
+                } else {
+                    btn.innerText = "See All";
+                }
+            }
+
+            // Feature 3: The "I'm Overwhelmed" Button (SOS)
+            let breathInterval;
+
+            function triggerPanicProtocol() {
+                document.getElementById('sosModal').classList.add('active');
+            }
+
+            function startBreathingSession() {
+                document.getElementById('sosModal').classList.remove('active');
+                const overlay = document.getElementById('breathingOverlay');
+                overlay.classList.add('active');
+
+                const text = document.getElementById('breathText');
+
+                // Simple Breath Logic (10s cycle: 4 in, 6 out)
+                let cycle = 0;
+                const updateBreath = () => {
+                    if (cycle % 2 === 0) {
+                        text.innerText = "Inhale...";
                     } else {
-                        addMessageToUI("Google Network issue. Please try again.", 'bot');
+                        text.innerText = "Exhale slowly...";
                     }
+                    cycle++;
+                };
+
+                updateBreath(); // Run immediately
+                // Since the CSS animation is 10s total, we split it approximately
+                breathInterval = setInterval(() => {
+                    updateBreath();
+                }, 5000);
+            }
+
+            function closePanicProtocol() {
+                clearInterval(breathInterval);
+                document.getElementById('breathingOverlay').classList.remove('active');
+            }
+
+            // Feature 4: AI Chatbot (Secure Dual-Provider Integration)
+            const BASE_SYSTEM_INSTRUCTION = "You are Aura, an empathetic, friendly, and brief mental wellbeing helper. Do not give medical advice. Keep responses short (1-2 sentences).";
+
+            // --- RAG MEMORY ENGINE ---
+            function saveToJournalMemory(role, text) {
+                let memory = JSON.parse(localStorage.getItem('aura_rag_memory') || '[]');
+                memory.push({ role, text, timestamp: new Date().toISOString() });
+                // Keep only the last 10 interactions (sliding window context)
+                if (memory.length > 20) memory.shift();
+                localStorage.setItem('aura_rag_memory', JSON.stringify(memory));
+            }
+
+            function getJournalContext() {
+                let memory = JSON.parse(localStorage.getItem('aura_rag_memory') || '[]');
+                if (memory.length === 0) return "";
+                let contextStr = "\n\n--- PAST MEMORY CONTEXT ---\nThe user previously said:\n";
+                memory.forEach(m => {
+                    if (m.role === 'user') contextStr += `- "${m.text}"\n`;
+                });
+                return contextStr;
+            }
+
+            let chatHistory = [];
+
+            function toggleChatSettings() {
+                const settings = document.getElementById('chatSettings');
+                settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
+            }
+
+            function saveChatSettings() {
+                const provider = document.getElementById('aiProvider').value;
+                const key = document.getElementById('aiApiKey').value.trim();
+                const qMode = document.getElementById('qualityModeToggle').checked;
+                if (key || provider === 'ollama') {
+                    localStorage.setItem('aura_ai_provider', provider);
+                    localStorage.setItem('aura_ai_key', key);
                 }
-                else if (provider === 'huggingface') {
-                    // Restructure chat for Hugging Face standard
-                    let hfMessages = [{ role: "system", content: SYSTEM_INSTRUCTION }];
-                    chatHistory.forEach(msg => {
-                        hfMessages.push({
-                            role: msg.role === 'model' ? 'assistant' : 'user',
-                            content: msg.parts[0].text
+                localStorage.setItem('aura_quality_mode', qMode);
+            }
+
+            function loadChatSettings() {
+                const provider = localStorage.getItem('aura_ai_provider') || 'gemini-3-flash-preview';
+                const key = localStorage.getItem('aura_ai_key') || '';
+                const qMode = localStorage.getItem('aura_quality_mode') === 'true';
+                document.getElementById('aiProvider').value = provider;
+                document.getElementById('aiApiKey').value = key;
+                document.getElementById('qualityModeToggle').checked = qMode;
+            }
+
+            // Bind cloud click to open chat
+            document.querySelector('.chatbot-cloud').addEventListener('click', () => {
+                toggleChat();
+                loadChatSettings();
+            });
+
+            function toggleChat() {
+                const modal = document.getElementById('chatModal');
+                modal.classList.toggle('active');
+                if (modal.classList.contains('active')) {
+                    document.getElementById('chatInput').focus();
+                }
+            }
+
+            function handleKeyPress(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            }
+
+            // --- Offline CalmTalk Logic ---
+            function offlineBotReply(text) {
+                text = text.toLowerCase();
+                let reply = "Thank you for sharing. You're not alone.";
+
+                if (text.includes("stress") || text.includes("pressure")) {
+                    reply = "It sounds like you're under a lot of pressure. Try taking things one step at a time. Even small breaks help. 🌿";
+                }
+                else if (text.includes("anxious") || text.includes("anxiety")) {
+                    reply = "Feeling anxious can be really uncomfortable. Let's slow your breathing for a moment. You are safe right now. 🤍";
+                }
+                else if (text.includes("panic")) {
+                    reply = "Panic can feel intense, but it will pass. Try to focus on something you can see or touch around you. I'm right here.";
+                }
+                else if (text.includes("tired") || text.includes("exhausted")) {
+                    reply = "It sounds like you've been doing a lot. Rest is not laziness—it's necessary. Please get some sleep soon. 🌙";
+                }
+                else if (text.includes("sad") || text.includes("down")) {
+                    reply = "I hear that you're feeling low. Your feelings matter, and it's okay to feel this way. 🌧️";
+                }
+                else {
+                    reply = "I'm listening. You're doing your best, and that's enough for now. 🤍";
+                }
+                return reply;
+            }
+
+            async function sendMessage() {
+                const inputField = document.getElementById('chatInput');
+                const message = inputField.value.trim();
+                if (!message) return;
+
+                const provider = localStorage.getItem('aura_ai_provider') || 'gemini-3-flash-preview';
+                const apiKey = localStorage.getItem('aura_ai_key');
+
+                // 1. Display User Message
+                addMessageToUI(message, 'user');
+                inputField.value = '';
+
+                // 2. Show Typing Indicator
+                const typingIndicator = document.getElementById('typingIndicator');
+                typingIndicator.style.display = 'block';
+                scrollChatToBottom();
+
+                // Append to internal history structure
+                chatHistory.push({ role: "user", parts: [{ text: message }] });
+                saveToJournalMemory('user', message);
+
+                const DYNAMIC_SYSTEM_INSTRUCTION = BASE_SYSTEM_INSTRUCTION + getJournalContext();
+
+                // 3. Fallback to Offline CalmTalk if NO API KEY is present
+                if (!apiKey) {
+                    setTimeout(() => {
+                        typingIndicator.style.display = 'none';
+                        const fallbackReply = offlineBotReply(message);
+                        addMessageToUI(fallbackReply, 'bot');
+
+                        // Add gentle nudge to settings occasionally
+                        if (Math.random() > 0.7) {
+                            setTimeout(() => { addMessageToUI("*(P.S. To unlock advanced AI conversation, click the ⚙️ gear icon and add your key!)*", 'bot'); }, 1000);
+                        }
+                    }, 800);
+                    return;
+                }
+
+                // 4. Call AI Provider (If Key Exists)
+                try {
+                    if (provider.startsWith('gemini')) {
+                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${provider}:generateContent?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                systemInstruction: { parts: [{ text: DYNAMIC_SYSTEM_INSTRUCTION }] },
+                                contents: chatHistory
+                            })
                         });
-                    });
+                        const data = await response.json();
+                        typingIndicator.style.display = 'none';
 
-                    const response = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions", {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${apiKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            model: "mistralai/Mistral-7B-Instruct-v0.3",
-                            messages: hfMessages,
-                            max_tokens: 150
-                        })
-                    });
-                    const data = await response.json();
+                        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                            const botReply = data.candidates[0].content.parts[0].text;
+                            addMessageToUI(botReply, 'bot');
+                            chatHistory.push({ role: "model", parts: [{ text: botReply }] });
+                            saveToJournalMemory('model', botReply); // Added for Gemini
+                        } else if (data.error) {
+                            addMessageToUI(`SYSTEM ERROR: Google API rejected the key. Reason: ${data.error.message}`, 'bot');
+                        } else {
+                            addMessageToUI("Google Network issue. Please try again.", 'bot');
+                        }
+                    }
+                    else if (provider === 'huggingface') {
+                        // Restructure chat for Hugging Face standard
+                        let hfMessages = [{ role: "system", content: DYNAMIC_SYSTEM_INSTRUCTION }];
+                        chatHistory.forEach(msg => {
+                            hfMessages.push({
+                                role: msg.role === 'model' ? 'assistant' : 'user',
+                                content: msg.parts[0].text
+                            });
+                        });
+
+                        const response = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions", {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${apiKey}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                model: "mistralai/Mistral-7B-Instruct-v0.3",
+                                messages: hfMessages,
+                                max_tokens: 150
+                            })
+                        });
+                        const data = await response.json();
+                        typingIndicator.style.display = 'none';
+
+                        if (data.choices && data.choices[0] && data.choices[0].message) {
+                            const botReply = data.choices[0].message.content;
+                            addMessageToUI(botReply, 'bot');
+                            chatHistory.push({ role: "model", parts: [{ text: botReply }] });
+                            saveToJournalMemory('model', botReply);
+                        } else if (data.error) {
+                            addMessageToUI(`Hugging Face API Error: ${data.error}`, 'bot');
+                        } else {
+                            addMessageToUI("Model is still booting up on Hugging Face. Try again in 15 seconds!", 'bot');
+                        }
+                    }
+                    else if (provider === 'ollama') {
+                        const response = await fetch("http://localhost:11434/api/generate", {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                model: "mistral", // Ensure mistral or phi3 is installed locally
+                                prompt: DYNAMIC_SYSTEM_INSTRUCTION + "\n\nUser: " + message + "\n\nAura:",
+                                stream: false
+                            })
+                        });
+                        const data = await response.json();
+                        typingIndicator.style.display = 'none';
+
+                        if (data.response) {
+                            let botReply = data.response;
+                            addMessageToUI(botReply, 'bot');
+                            chatHistory.push({ role: "model", parts: [{ text: botReply }] });
+                            saveToJournalMemory('model', botReply);
+                        } else {
+                            addMessageToUI("Local Ollama not responding. Is the server running?", 'bot');
+                        }
+                    }
+
+                    // --- QUALITY MODE VERIFICATION (DRAFT -> VERIFY -> REVISE) ---
+                    const isQualityMode = localStorage.getItem('aura_quality_mode') === 'true';
+                    if (isQualityMode && provider.startsWith('gemini') && chatHistory.length > 0) {
+                        try {
+                            const lastBotReply = chatHistory[chatHistory.length - 1].parts[0].text;
+
+                            // Visual cue that deep thinking is happening
+                            const msgs = document.getElementById('chatMessages');
+                            msgs.lastChild.previousSibling.innerHTML += `<br><br><i style="font-size:0.8rem; color:var(--text-muted);"><i class="ph ph-spinner"></i> Quality Mode: Deeply analyzing draft...</i>`;
+
+                            const verificationPrompt = `You are a Psychological Reviewer. Review this draft response: "${lastBotReply}". Is it deeply empathetic and free of harmful medical advice? Revise it to be warmer and more profound, ensuring it grounds the user effectively. Provide ONLY the final revised response.`;
+
+                            const vResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${provider}:generateContent?key=${apiKey}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    systemInstruction: { parts: [{ text: BASE_SYSTEM_INSTRUCTION }] },
+                                    contents: [{ role: "user", parts: [{ text: verificationPrompt }] }]
+                                })
+                            });
+                            const vData = await vResponse.json();
+                            if (vData.candidates && vData.candidates[0]) {
+                                const revisedReply = vData.candidates[0].content.parts[0].text;
+                                msgs.lastChild.previousSibling.innerHTML = revisedReply + `<br><i style="font-size:0.75rem; color:#9B86BD;">✨ Verified deep insight</i>`;
+                                // Update history to the better version
+                                chatHistory[chatHistory.length - 1].parts[0].text = revisedReply;
+                                // Re-save Memory to RAG
+                                let memory = JSON.parse(localStorage.getItem('aura_rag_memory') || '[]');
+                                memory[memory.length - 1].text = revisedReply;
+                                localStorage.setItem('aura_rag_memory', JSON.stringify(memory));
+                            }
+                        } catch (e) { console.warn("Quality mode revision failed, keeping draft.", e); }
+                    }
+
+                } catch (error) {
+                    console.error(error);
                     typingIndicator.style.display = 'none';
+                    addMessageToUI(`Connection Error: ${error.message}`, 'bot');
+                }
+            }
 
-                    if (data.choices && data.choices[0] && data.choices[0].message) {
-                        const botReply = data.choices[0].message.content;
-                        addMessageToUI(botReply, 'bot');
-                        chatHistory.push({ role: "model", parts: [{ text: botReply }] });
-                    } else if (data.error) {
-                        addMessageToUI(`Hugging Face API Error: ${data.error}`, 'bot');
+            function addMessageToUI(text, sender) {
+                const messagesContainer = document.getElementById('chatMessages');
+                const typingIndicator = document.getElementById('typingIndicator');
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `msg ${sender}`;
+                msgDiv.textContent = text;
+
+                messagesContainer.insertBefore(msgDiv, typingIndicator);
+                scrollChatToBottom();
+            }
+
+            function scrollChatToBottom() {
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            // Feature 5: International Level Gamification (LocalStorage)
+            function initGamification() {
+                // Check Local Storage
+                if (!localStorage.getItem('zenPoints')) localStorage.setItem('zenPoints', '0');
+                if (!localStorage.getItem('streakCount')) localStorage.setItem('streakCount', '1');
+                if (!localStorage.getItem('lastPlayDate')) localStorage.setItem('lastPlayDate', new Date().toDateString());
+
+                const today = new Date().toDateString();
+                const lastPlay = localStorage.getItem('lastPlayDate');
+                let streak = parseInt(localStorage.getItem('streakCount'));
+
+                // Check if streak is broken (more than 1 day difference)
+                // Simplified check: if not today, it's a new day. Real app needs actual date math.
+                if (today !== lastPlay) {
+                    // For prototype, we just increment it.
+                    streak += 1;
+                    localStorage.setItem('streakCount', streak);
+                    localStorage.setItem('lastPlayDate', today);
+                }
+
+                // Update UI
+                document.getElementById('zenPoints').innerText = localStorage.getItem('zenPoints');
+                document.getElementById('streakCount').innerText = streak;
+
+                // Dynamic Greetings
+                const hour = new Date().getHours();
+                let timeGreeting = 'Good evening';
+                if (hour < 12) timeGreeting = 'Good morning';
+                else if (hour < 18) timeGreeting = 'Good afternoon';
+
+                // International Greetings Array
+                const greetings = ["Namaste", "Hola", "Bonjour", "Ciao", "Konnichiwa", "Halo", "Aloha"];
+                const randomGreet = greetings[Math.floor(Math.random() * greetings.length)];
+
+                document.getElementById('greetingTitle').innerHTML = `${timeGreeting} <span class="stat-badge"><i class="ph-fill ph-fire"></i> <span id="streakCount">${streak}</span></span>`;
+
+                // Daily Motivational Quotes
+                const quotes = [
+                    "Take a deep breath. You are exactly where you need to be.",
+                    "Small steps every day.",
+                    "Be kind to your mind today.",
+                    "Your energy is your greatest currency.",
+                    "Peace begins with a smile.",
+                    `${randomGreet}. Ready to find your center?`
+                ];
+                document.getElementById('greetingSub').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+                // Check Badges
+                const pts = parseInt(localStorage.getItem('zenPoints') || '0');
+                if (pts >= 1) document.getElementById('badge-1').classList.add('unlocked');
+                if (pts >= 10) document.getElementById('badge-10').classList.add('unlocked');
+                if (pts >= 50) document.getElementById('badge-50').classList.add('unlocked');
+                if (streak >= 3) document.getElementById('badge-streak').classList.add('unlocked');
+            }
+
+            // --- 🤖 AI Webcam Stress Integration ---
+            let stressTicks = 0;
+            let isAuraIntervening = false;
+
+            async function pollStressAPI() {
+                if (isAuraIntervening) return; // Don't interrupt if already chatting
+
+                try {
+                    const response = await fetch('http://localhost:5005/status');
+                    if (!response.ok) return;
+
+                    const data = await response.json();
+
+                    if (data.status.includes('STRESS') || data.status.includes('DROWSY')) {
+                        stressTicks++;
+                        console.log("Aura detects tension:", stressTicks, data.ear);
+
+                        // Trigger if stressed for ~3 seconds (assuming 1s polling)
+                        if (stressTicks >= 3) {
+                            triggerAIIntervention(data.status);
+                            stressTicks = 0;
+                        }
                     } else {
-                        addMessageToUI("Model is still booting up on Hugging Face. Try again in 15 seconds!", 'bot');
+                        stressTicks = Math.max(0, stressTicks - 1); // Cooldown
+                    }
+                } catch (err) {
+                    // Backend not running, silently fail
+                }
+            }
+
+            function triggerAIIntervention(statusType) {
+                isAuraIntervening = true;
+                toggleChat(); // Opens the chat modal
+
+                const isDrowsy = statusType.includes('DROWSY');
+                const introMsg = isDrowsy ?
+                    "Hey... my optical sensors suggest you might be exhausted or falling asleep. Do you want to take a 5-minute break?" :
+                    "I'm noticing some tension in your facial muscles. Take a deep breath. Would you like to play the Gravity Anchor or just talk?";
+
+                // Inject an artificial message from Aura
+                const chatMessages = document.getElementById('chatMessages');
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>Aura:</strong> ${introMsg}`;
+                p.style.backgroundColor = '#f4eef6';
+                p.style.borderLeft = '4px solid #DFB6B2';
+                chatMessages.appendChild(p);
+
+                // Scroll to bottom
+                const chatArea = document.querySelector('.chat-messages');
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+                // Reset after 30 seconds
+                setTimeout(() => { isAuraIntervening = false; }, 30000);
+            }
+
+            // --- 🌊 Wildcard 2: Unified Logic Layer (The Trigger) ---
+            let lastScrollY = window.scrollY;
+            let lastScrollTime = Date.now();
+            let isInterventionActive = false;
+
+            window.addEventListener('scroll', () => {
+                // Do not detect if the SPA overlay is already open
+                if (document.getElementById('appViewer').classList.contains('active')) return;
+
+                const currentY = window.scrollY;
+                const currentTime = Date.now();
+                const timeDiff = currentTime - lastScrollTime;
+
+                if (timeDiff > 0) {
+                    const velocity = Math.abs(currentY - lastScrollY) / timeDiff;
+
+                    // If "Frantic Scrolling" is detected, frictionless transition to the intervention
+                    if (velocity > 4.0 && !isInterventionActive) {
+                        isInterventionActive = true;
+                        console.log("Frantic scrolling detected! Velocity:", velocity);
+
+                        // Launch the Antigravity module automatically
+                        launchApp('antigravity-cmdr.html');
+
+                        // Cooldown to prevent immediate retrigger
+                        setTimeout(() => { isInterventionActive = false; }, 5000);
                     }
                 }
+
+                lastScrollY = currentY;
+                lastScrollTime = currentTime;
+            });
+
+            // Run on load
+            window.addEventListener('DOMContentLoaded', () => {
+                initGamification();
+                // setInterval(pollStressAPI, 1000); // Disabling Python Poller in favor of pure JS Deep Vision
+            });
+
+        </script>
+    </section>
+
+    <!-- ================= 3. APP VIEWER OVERLAY (SPA) ================= -->
+    <div id="appViewer">
+        <button class="close-app-btn" onclick="closeApp()"><i class="ph ph-arrow-left"></i></button>
+        <iframe id="gameFrame" src=""></iframe>
+    </div>
+
+    <!-- Firebase SDK & SPA Router Implementation -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { firebaseConfig } from './firebase-config.js';
+
+        let app, auth;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+        } catch (e) {
+            console.warn("Firebase not configured. Using mock auth.");
+        }
+
+        window.skipLogin = function () {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('hubView').style.display = 'block';
+
+            // Convert existing Card links into SPA iFrame triggers
+            document.querySelectorAll('.card, .hero-btn, .sos-modal-btn.btn-talk').forEach(el => {
+                const clickFn = el.getAttribute('onclick');
+                if (clickFn && clickFn.includes('window.location.href')) {
+                    const dest = clickFn.match(/'(.*?)'/)[1];
+                    el.setAttribute('onclick', `launchApp('${dest}', event)`);
+                }
+            });
+        }
+
+        // Exposing Global Auth Flags
+        window.isLogin = true;
+        window.toggleMode = function () {
+            window.isLogin = !window.isLogin;
+            document.getElementById('formTitle').innerHTML = window.isLogin ? '<i class="ph-fill ph-cloud-sun"></i> Aura' : '<i class="ph-fill ph-sparkle"></i> Join Aura';
+            document.getElementById('formSubtitle').innerText = window.isLogin ? 'Welcome to your safe space.' : 'Begin your wellbeing journey.';
+            document.getElementById('actionBtn').innerText = window.isLogin ? 'Sign In' : 'Create Account';
+            document.getElementById('switchBtn').innerText = window.isLogin ? 'New here? Create an account' : 'Already have an account? Sign in';
+            document.getElementById('errorMsg').innerText = '';
+        }
+
+        window.handleAuth = async function () {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('errorMsg');
+            const actionBtn = document.getElementById('actionBtn');
+
+            if (!email || !password) {
+                errorDiv.innerText = "Please fill in all fields."; return;
+            }
+            if (!auth) { window.skipLogin(); return; }
+
+            // Trigger the Somatic Breathing Orb Loader interaction
+            actionBtn.classList.add('breathing-loader');
+            if (navigator.vibrate) navigator.vibrate([150, 50, 150]); // Haptic click
+
+            try {
+                // Minimum aesthetic 2-second delay to force the user to watch the breathing orb
+                await new Promise(r => setTimeout(r, 2000));
+
+                if (window.isLogin) await signInWithEmailAndPassword(auth, email, password);
+                else await createUserWithEmailAndPassword(auth, email, password);
+
+                // Fade out transition
+                document.getElementById('loginView').style.transition = 'opacity 1s ease';
+                document.getElementById('loginView').style.opacity = '0';
+                setTimeout(() => window.skipLogin(), 1000);
             } catch (error) {
+                // HACKATHON BYPASS: Automatically mock success if Firebase is missing a real key
+                if (error.code === 'auth/api-key-not-valid' || error.message.includes('API key not valid')) {
+                    console.warn("Hackathon Mock Mode: Bypassing Firebase Auth missing key.");
+                    document.getElementById('loginView').style.transition = 'opacity 1s ease';
+                    document.getElementById('loginView').style.opacity = '0';
+                    setTimeout(() => window.skipLogin(), 1000);
+                    return;
+                }
+
+                actionBtn.classList.remove('breathing-loader');
                 console.error(error);
-                typingIndicator.style.display = 'none';
-                addMessageToUI(`Connection Error: ${error.message}`, 'bot');
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') errorDiv.innerText = "That doesn't match our records. Try again?";
+                else if (error.code === 'auth/email-already-in-use') errorDiv.innerText = "You already have a safe space here. Try signing in!";
+                else errorDiv.innerText = error.message.replace('Firebase:', '').trim();
             }
         }
-
-        function addMessageToUI(text, sender) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const typingIndicator = document.getElementById('typingIndicator');
-
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `msg ${sender}`;
-            msgDiv.textContent = text;
-
-            messagesContainer.insertBefore(msgDiv, typingIndicator);
-            scrollChatToBottom();
+    </script>
+    <script>
+        // SPA Virtual Router functions
+        function launchApp(url, event) {
+            if (event) event.preventDefault();
+            const viewer = document.getElementById('appViewer');
+            const frame = document.getElementById('gameFrame');
+            frame.src = url;
+            viewer.classList.add('active');
         }
 
-        function scrollChatToBottom() {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
+        function closeApp() {
+            const viewer = document.getElementById('appViewer');
+            const frame = document.getElementById('gameFrame');
+            viewer.classList.remove('active');
+            setTimeout(() => { frame.src = ""; }, 300); // Wait for animation before killing p5 runtime
 
-        // Feature 5: International Level Gamification (LocalStorage)
-        function initGamification() {
-            // Check Local Storage
-            if (!localStorage.getItem('zenPoints')) localStorage.setItem('zenPoints', '0');
-            if (!localStorage.getItem('streakCount')) localStorage.setItem('streakCount', '1');
-            if (!localStorage.getItem('lastPlayDate')) localStorage.setItem('lastPlayDate', new Date().toDateString());
-
-            const today = new Date().toDateString();
-            const lastPlay = localStorage.getItem('lastPlayDate');
-            let streak = parseInt(localStorage.getItem('streakCount'));
-
-            // Check if streak is broken (more than 1 day difference)
-            // Simplified check: if not today, it's a new day. Real app needs actual date math.
-            if (today !== lastPlay) {
-                // For prototype, we just increment it.
-                streak += 1;
-                localStorage.setItem('streakCount', streak);
-                localStorage.setItem('lastPlayDate', today);
+            // If they played a game, update their Hub score
+            if (typeof initGamification === "function") {
+                initGamification();
             }
-
-            // Update UI
-            document.getElementById('zenPoints').innerText = localStorage.getItem('zenPoints');
-            document.getElementById('streakCount').innerText = streak;
-
-            // Dynamic Greetings
-            const hour = new Date().getHours();
-            let timeGreeting = 'Good evening';
-            if (hour < 12) timeGreeting = 'Good morning';
-            else if (hour < 18) timeGreeting = 'Good afternoon';
-
-            // International Greetings Array
-            const greetings = ["Namaste", "Hola", "Bonjour", "Ciao", "Konnichiwa", "Halo", "Aloha"];
-            const randomGreet = greetings[Math.floor(Math.random() * greetings.length)];
-
-            document.getElementById('greetingTitle').innerHTML = `${timeGreeting} <span class="stat-badge"><i class="ph-fill ph-fire"></i> <span id="streakCount">${streak}</span></span>`;
-
-            // Daily Motivational Quotes
-            const quotes = [
-                "Take a deep breath. You are exactly where you need to be.",
-                "Small steps every day.",
-                "Be kind to your mind today.",
-                "Your energy is your greatest currency.",
-                "Peace begins with a smile.",
-                `${randomGreet}. Ready to find your center?`
-            ];
-            document.getElementById('greetingSub').innerText = quotes[Math.floor(Math.random() * quotes.length)];
-
-            // Check Badges
-            const pts = parseInt(localStorage.getItem('zenPoints') || '0');
-            if (pts >= 1) document.getElementById('badge-1').classList.add('unlocked');
-            if (pts >= 10) document.getElementById('badge-10').classList.add('unlocked');
-            if (pts >= 50) document.getElementById('badge-50').classList.add('unlocked');
-            if (streak >= 3) document.getElementById('badge-streak').classList.add('unlocked');
         }
-
-        // Run on load
-        window.addEventListener('DOMContentLoaded', initGamification);
-
     </script>
 </body>
 
