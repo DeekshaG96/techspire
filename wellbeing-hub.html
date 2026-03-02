@@ -900,7 +900,24 @@
     <div class="chat-modal" id="chatModal">
         <div class="chat-header">
             <h3><i class="ph-fill ph-cloud-sun" style="color:var(--sage-green);"></i> Aura Helper</h3>
-            <button class="close-chat" onclick="toggleChat()"><i class="ph ph-x"></i></button>
+            <div>
+                <button class="close-chat" onclick="toggleChatSettings()" style="margin-right: 10px;"
+                    title="API Keys & Settings"><i class="ph ph-gear"></i></button>
+                <button class="close-chat" onclick="toggleChat()"><i class="ph ph-x"></i></button>
+            </div>
+        </div>
+        <!-- Settings Panel -->
+        <div class="chat-settings" id="chatSettings"
+            style="display:none; padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee;">
+            <select id="aiProvider" onchange="saveChatSettings()"
+                style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit;">
+                <option value="gemini">Google Gemini 1.5</option>
+                <option value="huggingface">Hugging Face (Mistral)</option>
+            </select>
+            <input type="password" id="aiApiKey" placeholder="Enter API Key/Token" onchange="saveChatSettings()"
+                style="width: 100%; box-sizing:border-box; padding: 8px; border-radius: 8px; border: 1px solid #ccc; margin-top: 10px; font-family: inherit;">
+            <p style="font-size: 0.75rem; color: #777; margin-top: 8px; line-height: 1.3;">Your key is encrypted in your
+                device's <b>local storage</b> and is entirely hidden from GitHub.</p>
         </div>
         <div class="chat-messages" id="chatMessages">
             <div class="msg bot">Hi Alex! I'm here if you need to talk, vent, or just want a distraction. How are you
@@ -980,12 +997,37 @@
             document.getElementById('breathingOverlay').classList.remove('active');
         }
 
-        // Feature 4: AI Chatbot (Gemini Integration)
-        const GEMINI_API_KEY = "AIzaSyCqWoMA0-oXeqwQ24xMFQpK73S-535xtfI";
+        // Feature 4: AI Chatbot (Secure Dual-Provider Integration)
         const SYSTEM_INSTRUCTION = "You are Aura, an empathetic, friendly, and brief mental wellbeing helper. Do not give medical advice. If a user is overwhelmed, suggest using the SOS button or breathing exercises. Keep responses short (1-2 sentences).";
 
+        let chatHistory = [];
+
+        function toggleChatSettings() {
+            const settings = document.getElementById('chatSettings');
+            settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function saveChatSettings() {
+            const provider = document.getElementById('aiProvider').value;
+            const key = document.getElementById('aiApiKey').value.trim();
+            if (key) {
+                localStorage.setItem('aura_ai_provider', provider);
+                localStorage.setItem('aura_ai_key', key);
+            }
+        }
+
+        function loadChatSettings() {
+            const provider = localStorage.getItem('aura_ai_provider') || 'gemini';
+            const key = localStorage.getItem('aura_ai_key') || '';
+            document.getElementById('aiProvider').value = provider;
+            document.getElementById('aiApiKey').value = key;
+        }
+
         // Bind cloud click to open chat
-        document.querySelector('.chatbot-cloud').addEventListener('click', toggleChat);
+        document.querySelector('.chatbot-cloud').addEventListener('click', () => {
+            toggleChat();
+            loadChatSettings();
+        });
 
         function toggleChat() {
             const modal = document.getElementById('chatModal');
@@ -1001,13 +1043,18 @@
             }
         }
 
-        // Maintain simple chat history context
-        let chatHistory = [];
-
         async function sendMessage() {
             const inputField = document.getElementById('chatInput');
             const message = inputField.value.trim();
             if (!message) return;
+
+            const provider = localStorage.getItem('aura_ai_provider') || 'gemini';
+            const apiKey = localStorage.getItem('aura_ai_key');
+
+            if (!apiKey) {
+                addMessageToUI("Hi! Before we chat securely, please click the gear icon ⚙️ above to enter your exact API key. This keeps your key safe from public servers!", 'bot');
+                return;
+            }
 
             // 1. Display User Message
             addMessageToUI(message, 'user');
@@ -1018,37 +1065,72 @@
             typingIndicator.style.display = 'block';
             scrollChatToBottom();
 
-            // Append to history
+            // Append to internal history structure
             chatHistory.push({ role: "user", parts: [{ text: message }] });
 
-            // 3. Call Gemini API
+            // 3. Call AI Provider
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-                        contents: chatHistory
-                    })
-                });
+                if (provider === 'gemini') {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+                            contents: chatHistory
+                        })
+                    });
+                    const data = await response.json();
+                    typingIndicator.style.display = 'none';
 
-                const data = await response.json();
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        const botReply = data.candidates[0].content.parts[0].text;
+                        addMessageToUI(botReply, 'bot');
+                        chatHistory.push({ role: "model", parts: [{ text: botReply }] });
+                    } else if (data.error) {
+                        addMessageToUI(`SYSTEM ERROR: Google API rejected the key. Reason: ${data.error.message}`, 'bot');
+                    } else {
+                        addMessageToUI("Google Network issue. Please try again.", 'bot');
+                    }
+                }
+                else if (provider === 'huggingface') {
+                    // Restructure chat for Hugging Face standard
+                    let hfMessages = [{ role: "system", content: SYSTEM_INSTRUCTION }];
+                    chatHistory.forEach(msg => {
+                        hfMessages.push({
+                            role: msg.role === 'model' ? 'assistant' : 'user',
+                            content: msg.parts[0].text
+                        });
+                    });
 
-                typingIndicator.style.display = 'none';
+                    const response = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions", {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            model: "mistralai/Mistral-7B-Instruct-v0.3",
+                            messages: hfMessages,
+                            max_tokens: 150
+                        })
+                    });
+                    const data = await response.json();
+                    typingIndicator.style.display = 'none';
 
-                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                    const botReply = data.candidates[0].content.parts[0].text;
-                    addMessageToUI(botReply, 'bot');
-                    chatHistory.push({ role: "model", parts: [{ text: botReply }] });
-                } else {
-                    addMessageToUI("I'm having a little trouble connecting right now, but taking a deep breath always helps.", 'bot');
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        const botReply = data.choices[0].message.content;
+                        addMessageToUI(botReply, 'bot');
+                        chatHistory.push({ role: "model", parts: [{ text: botReply }] });
+                    } else if (data.error) {
+                        addMessageToUI(`Hugging Face API Error: ${data.error}`, 'bot');
+                    } else {
+                        addMessageToUI("Model is still booting up on Hugging Face. Try again in 15 seconds!", 'bot');
+                    }
                 }
             } catch (error) {
                 console.error(error);
                 typingIndicator.style.display = 'none';
-                addMessageToUI("Oh no! I lost my connection. Take a deep breath!", 'bot');
+                addMessageToUI(`Connection Error: ${error.message}`, 'bot');
             }
         }
 
