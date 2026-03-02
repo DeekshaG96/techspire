@@ -562,6 +562,133 @@
             display: none;
             font-style: italic;
         }
+
+        /* Achievements Shelf */
+        .shelf-container {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+        }
+
+        .shelf-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badges-grid {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .badge {
+            min-width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            opacity: 0.4;
+            filter: grayscale(100%);
+            transition: all 0.5s;
+        }
+
+        .badge.unlocked {
+            opacity: 1;
+            filter: grayscale(0%);
+            box-shadow: 0 0 15px rgba(156, 191, 167, 0.4);
+        }
+
+        .badge-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .badge-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* SOS Dual Choice Modal */
+        .sos-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(26, 28, 32, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            color: #fff;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .sos-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .sos-modal-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+
+        .sos-modal-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-breathe {
+            background: var(--sage-green);
+            color: #fff;
+        }
+
+        .btn-talk {
+            background: #FF5A5F;
+            color: #fff;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: var(--text-muted);
+            text-decoration: underline;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -601,6 +728,29 @@
             </div>
             <div style="font-size: 4rem; color: var(--pastel-lavender);">
                 <i class="ph-duotone ph-sparkle"></i>
+            </div>
+        </div>
+
+        <!-- Achievement Shelf -->
+        <div class="shelf-container">
+            <div class="shelf-header"><i class="ph-duotone ph-medal" style="color:#F5A623;"></i> Zen Achievements</div>
+            <div class="badges-grid" id="badgesGrid">
+                <div class="badge" id="badge-1">
+                    <div class="badge-icon">🌱</div>
+                    <div class="badge-name">First Step</div>
+                </div>
+                <div class="badge" id="badge-10">
+                    <div class="badge-icon">🌿</div>
+                    <div class="badge-name">10 Points</div>
+                </div>
+                <div class="badge" id="badge-50">
+                    <div class="badge-icon">🌳</div>
+                    <div class="badge-name">Zen Master(50)</div>
+                </div>
+                <div class="badge" id="badge-streak">
+                    <div class="badge-icon">🔥</div>
+                    <div class="badge-name">3 Day Streak</div>
+                </div>
             </div>
         </div>
 
@@ -649,6 +799,22 @@
                     <div class="card-icon"><i class="ph-duotone ph-headphones"></i></div>
                     <h3>Sound Bath</h3>
                     <p>Mix your own ambient noise</p>
+                </div>
+            </a>
+
+            <a href="bubble-pop.html" style="text-decoration:none;" class="card card-games hidden-module">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-drop"></i></div>
+                    <h3>Bubble Pop</h3>
+                    <p>Gamified mindful breathing</p>
+                </div>
+            </a>
+
+            <a href="mood-jar.html" style="text-decoration:none;" class="card card-games hidden-module">
+                <div>
+                    <div class="card-icon"><i class="ph-duotone ph-jar"></i></div>
+                    <h3>Daily Mood Jar</h3>
+                    <p>Physics-based tracker</p>
                 </div>
             </a>
         </div>
@@ -711,6 +877,17 @@
         <button class="close-breath" onclick="closePanicProtocol()">Exit Session</button>
     </div>
 
+    <!-- SOS Dual Choice Modal -->
+    <div class="sos-modal" id="sosModal">
+        <h2 style="margin-bottom: 30px; font-size: 1.8rem;">How can we help?</h2>
+        <button class="sos-modal-btn btn-breathe" onclick="startBreathingSession()"><i class="ph-fill ph-wind"></i>
+            Breathe with me</button>
+        <button class="sos-modal-btn btn-talk" onclick="window.location.href='crisis-hotlines.html'"><i
+                class="ph-fill ph-phone"></i> I need to talk to someone</button>
+        <button class="btn-cancel"
+            onclick="document.getElementById('sosModal').classList.remove('active')">Cancel</button>
+    </div>
+
     <!-- Chatbot Modal -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-header">
@@ -762,6 +939,11 @@
         let breathInterval;
 
         function triggerPanicProtocol() {
+            document.getElementById('sosModal').classList.add('active');
+        }
+
+        function startBreathingSession() {
+            document.getElementById('sosModal').classList.remove('active');
             const overlay = document.getElementById('breathingOverlay');
             overlay.classList.add('active');
 
@@ -925,6 +1107,13 @@
                 `${randomGreet}. Ready to find your center?`
             ];
             document.getElementById('greetingSub').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+            // Check Badges
+            const pts = parseInt(localStorage.getItem('zenPoints') || '0');
+            if (pts >= 1) document.getElementById('badge-1').classList.add('unlocked');
+            if (pts >= 10) document.getElementById('badge-10').classList.add('unlocked');
+            if (pts >= 50) document.getElementById('badge-50').classList.add('unlocked');
+            if (streak >= 3) document.getElementById('badge-streak').classList.add('unlocked');
         }
 
         // Run on load

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Global Support - Aura</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-cream: #FDFBF7;
+            --sage-green: #9CBFA7;
+            --pastel-lavender: #E0CBE6;
+            --text-dark: #373F41;
+            --text-muted: #828B8E;
+            --danger-red: #FF5A5F;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .back-btn {
+            background: var(--bg-cream);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .container {
+            padding: 24px;
+            padding-bottom: 60px;
+        }
+
+        .warning-banner {
+            background: rgba(255, 90, 95, 0.1);
+            border-left: 4px solid var(--danger-red);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .warning-banner p {
+            margin: 0;
+            color: var(--danger-red);
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .country-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            margin-bottom: 20px;
+        }
+
+        .country-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding-bottom: 12px;
+        }
+
+        .country-flag {
+            font-size: 1.5rem;
+        }
+
+        .country-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .resource {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .resource:last-child {
+            margin-bottom: 0;
+        }
+
+        .res-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            background: var(--sage-green);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .res-icon.text {
+            background: var(--pastel-lavender);
+        }
+
+        .res-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+        }
+
+        .res-info a {
+            display: inline-block;
+            color: var(--text-dark);
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .res-info p {
+            margin: 4px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="wellbeing-hub.html" class="back-btn"><i class="ph ph-arrow-left"></i></a>
+        <h1>Global Support Lines</h1>
+    </header>
+
+    <div class="container">
+        <div class="warning-banner">
+            <p><i class="ph-fill ph-warning-circle"></i> If you or someone you know is in immediate danger, please
+                contact your local emergency services immediately.</p>
+        </div>
+
+        <div class="country-card">
+            <div class="country-header">
+                <span class="country-flag">🇺🇸</span>
+                <span class="country-name">United States</span>
+            </div>
+
+            <div class="resource">
+                <div class="res-icon"><i class="ph-fill ph-phone"></i></div>
+                <div class="res-info">
+                    <h4>National Suicide & Crisis Lifeline</h4>
+                    <a href="tel:988">988</a>
+                    <p>Available 24/7. English & Spanish.</p>
+                </div>
+            </div>
+
+            <div class="resource">
+                <div class="res-icon text"><i class="ph-fill ph-chat-text"></i></div>
+                <div class="res-info">
+                    <h4>Crisis Text Line</h4>
+                    <a href="sms:741741">Text HOME to 741741</a>
+                    <p>Connect with a volunteer Crisis Counselor 24/7.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="country-card">
+            <div class="country-header">
+                <span class="country-flag">🇬🇧</span>
+                <span class="country-name">United Kingdom</span>
+            </div>
+
+            <div class="resource">
+                <div class="res-icon"><i class="ph-fill ph-phone"></i></div>
+                <div class="res-info">
+                    <h4>National Suicide Prevention Helpline</h4>
+                    <a href="tel:08006895652">0800 689 5652</a>
+                    <p>Available 24/7. Confidential and free.</p>
+                </div>
+            </div>
+
+            <div class="resource">
+                <div class="res-icon text"><i class="ph-fill ph-chat-text"></i></div>
+                <div class="res-info">
+                    <h4>Shout Crisis Text Line</h4>
+                    <a href="sms:85258">Text SHOUT to 85258</a>
+                    <p>Free, 24/7 mental health text support.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="country-card">
+            <div class="country-header">
+                <span class="country-flag">🇮🇳</span>
+                <span class="country-name">India</span>
+            </div>
+
+            <div class="resource">
+                <div class="res-icon"><i class="ph-fill ph-phone"></i></div>
+                <div class="res-info">
+                    <h4>AASRA Helpline</h4>
+                    <a href="tel:+919820466726">+91-9820466726</a>
+                    <p>Available 24/7. English and Hindi.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="country-card">
+            <div class="country-header">
+                <span class="country-flag">🇦🇺</span>
+                <span class="country-name">Australia</span>
+            </div>
+
+            <div class="resource">
+                <div class="res-icon"><i class="ph-fill ph-phone"></i></div>
+                <div class="res-info">
+                    <h4>Lifeline Australia</h4>
+                    <a href="tel:131114">13 11 14</a>
+                    <p>Available 24/7 crisis support.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="country-card">
+            <div class="country-header">
+                <span class="country-flag">🇨🇦</span>
+                <span class="country-name">Canada</span>
+            </div>
+
+            <div class="resource">
+                <div class="res-icon"><i class="ph-fill ph-phone"></i></div>
+                <div class="res-info">
+                    <h4>Talk Suicide Canada</h4>
+                    <a href="tel:18334564566">1-833-456-4566</a>
+                    <p>Available 24/7.</p>
+                </div>
+            </div>
+        </div>
+
+        <p style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:30px;">
+            <i class="ph ph-globe"></i> For more countries, please visit <a href="https://findahelpline.com/"
+                style="color:var(--sage-green);">Find A Helpline</a>.
+        </p>
+
+    </div>
+</body>
+
+</html>

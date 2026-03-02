@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bubble Pop - Aura</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-dark: #A9C2DB;
+            /* Soft blue sky */
+            --sage-glow: #9CBFA7;
+            --lavender-glow: #E0CBE6;
+            --text-light: #FDFBF7;
+            --text-dim: rgba(253, 251, 247, 0.7);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Inter', system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: none;
+            transition: background-color 2s ease;
+        }
+
+        header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-pill {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+        }
+
+        #canvas-container {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            z-index: 1;
+        }
+
+        /* The Breathing Guide */
+        .breath-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .breath-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(0.5);
+            transition: transform 0.1s linear;
+        }
+
+        .breath-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+
+        .instruction {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-dim);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
+    <!-- Include p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <a href="wellbeing-hub.html" class="back-btn"><i class="ph ph-arrow-left"></i></a>
+        <div class="stats-pill"><i class="ph-fill ph-drop"></i> <span id="popCount">0</span></div>
+    </header>
+
+    <div class="breath-guide">
+        <div class="breath-ring" id="bRing"></div>
+        <div class="breath-text" id="bText">INHALE</div>
+    </div>
+
+    <div class="instruction">Tap bubbles to pop them</div>
+
+    <div id="canvas-container"></div>
+
+    <script>
+        let bubbles = [];
+        let poppedTotal = 0;
+
+        // Breathing state (4-7-8)
+        // Let's do a simpler 4 In, 6 Out for a game flow to keep bubbles popping
+        let phase = 'in'; // 'in', 'out'
+        let phaseTime = 0;
+        let inDuration = 4000;
+        let outDuration = 6000;
+
+        function setup() {
+            let canvas = createCanvas(windowWidth, windowHeight);
+            canvas.parent('canvas-container');
+            noStroke();
+        }
+
+        function draw() {
+            clear();
+
+            // Breath Logic update
+            updateBreath();
+
+            // Spawn bubbles randomly at the bottom
+            if (random() > 0.95) {
+                bubbles.push(new Bubble(random(width), height + 50));
+            }
+
+            // Update & Draw Bubbles
+            for (let i = bubbles.length - 1; i >= 0; i--) {
+                bubbles[i].update();
+                bubbles[i].display();
+
+                // Remove if off screen
+                if (bubbles[i].y < -100) {
+                    bubbles.splice(i, 1);
+                }
+            }
+        }
+
+        function updateBreath() {
+            let now = millis();
+            let elapsed = now - phaseTime;
+            let ring = document.getElementById('bRing');
+            let text = document.getElementById('bText');
+
+            if (phase === 'in') {
+                if (elapsed > inDuration) {
+                    phase = 'out';
+                    phaseTime = now;
+                    document.body.style.backgroundColor = '#8B9EB5'; // darker on exhale
+                } else {
+                    let progress = elapsed / inDuration;
+                    ring.style.transform = `scale(${0.5 + (0.5 * progress)})`;
+                    text.innerText = "INHALE";
+                }
+            } else if (phase === 'out') {
+                if (elapsed > outDuration) {
+                    phase = 'in';
+                    phaseTime = now;
+                    document.body.style.backgroundColor = '#A9C2DB'; // lighter on inhale
+                } else {
+                    let progress = elapsed / outDuration;
+                    ring.style.transform = `scale(${1.0 - (0.5 * progress)})`;
+                    text.innerText = "EXHALE";
+                }
+            }
+        }
+
+        function mousePressed() {
+            handleTap(mouseX, mouseY);
+        }
+        function touchStarted() {
+            if (touches.length > 0) handleTap(touches[0].x, touches[0].y);
+            return false;
+        }
+
+        function handleTap(tx, ty) {
+            for (let i = bubbles.length - 1; i >= 0; i--) {
+                let d = dist(tx, ty, bubbles[i].x, bubbles[i].y);
+                if (d < bubbles[i].r) {
+                    // Pop it!
+                    createPopEffect(bubbles[i].x, bubbles[i].y);
+                    bubbles.splice(i, 1);
+                    poppedTotal++;
+                    document.getElementById('popCount').innerText = poppedTotal;
+
+                    // Gamification: Every 10 pops = 1 Zen Point
+                    if (poppedTotal % 10 === 0) {
+                        let currentPts = parseInt(localStorage.getItem('zenPoints') || '0');
+                        localStorage.setItem('zenPoints', currentPts + 1);
+                        confetti({
+                            particleCount: 50, spread: 60, origin: { x: tx / width, y: ty / height },
+                            colors: ['#FFFFFF', '#A9C2DB']
+                        });
+                    }
+                    break;
+                }
+            }
+        }
+
+        function createPopEffect(x, y) {
+            // A simple visual burst could be drawn, but we'll let canvas-confetti handle big milestones
+            // For tiny pops, we just draw a quick ring then remove it
+        }
+
+        class Bubble {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.r = random(20, 50);
+                this.speed = random(1, 3);
+                this.wobbleSpeed = random(0.01, 0.05);
+                this.wobbleOffset = random(TWO_PI);
+                this.color = color(255, random(100, 200)); // white with varying opacity
+            }
+
+            update() {
+                // Slower floating during exhale, faster during inhale
+                let mult = (phase === 'in') ? 1.5 : 0.8;
+                this.y -= this.speed * mult;
+                this.x += sin(frameCount * this.wobbleSpeed + this.wobbleOffset) * 1.5;
+            }
+
+            display() {
+                fill(this.color);
+                ellipse(this.x, this.y, this.r * 2);
+
+                // Bubble highlight
+                fill(255, 200);
+                ellipse(this.x - this.r * 0.3, this.y - this.r * 0.3, this.r * 0.4);
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+
+</body>
+
+</html>
