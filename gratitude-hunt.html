@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Gratitude Hunt - Aura</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-cream: #FDFBF7;
+            --pastel-lavender: #E0CBE6;
+            --sage-green: #9CBFA7;
+            --text-dark: #373F41;
+            --text-muted: #828B8E;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            font-family: 'Inter', system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            background: #fff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: var(--text-dark);
+            flex-shrink: 0;
+        }
+
+        .container {
+            flex: 1;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .hunt-card {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .icon-large {
+            font-size: 4rem;
+            color: var(--pastel-lavender);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin: 0 0 16px;
+            font-size: 1.5rem;
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .btn-hunt {
+            background: var(--pastel-lavender);
+            color: #fff;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(224, 203, 230, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .btn-hunt:active {
+            transform: scale(0.95);
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #E8E8E8;
+            transition: background 0.3s;
+        }
+
+        .dot.active {
+            background: var(--pastel-lavender);
+        }
+
+        /* Success Confetti overlay */
+        .confetti-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+    <!-- Simple Confetti Lib -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <a href="wellbeing-hub.html" class="back-btn"><i class="ph ph-arrow-left"></i></a>
+        <h1 style="margin:0; font-size:1.4rem;">Gratitude Hunt</h1>
+    </header>
+
+    <div class="container">
+
+        <div class="hunt-card" id="hunt-card">
+            <div class="icon-large" id="h-icon"><i class="ph-duotone ph-eyes"></i></div>
+            <h2 id="h-title">Look Around You.</h2>
+            <p id="h-desc">We're going to ground ourselves by finding 3 physical objects in the room.</p>
+
+            <button class="btn-hunt" id="h-btn" onclick="nextStep()">Start Hunt</button>
+
+            <div class="progress-dots" id="dots" style="display:none;">
+                <div class="dot active" id="dot1"></div>
+                <div class="dot" id="dot2"></div>
+                <div class="dot" id="dot3"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let step = 0;
+
+        const steps = [
+            {
+                icon: "ph-paint-brush",
+                title: "Find a Color",
+                desc: "Find something in the room that has your favorite color. Actually touch it.",
+                btnText: "Found it!"
+            },
+            {
+                icon: "ph-hand-palm",
+                title: "Find a Texture",
+                desc: "Find an object that feels comforting or soft to the touch.",
+                btnText: "Got it!"
+            },
+            {
+                icon: "ph-sparkle",
+                title: "Find a Memory",
+                desc: "Find something that reminds you of a time you laughed.",
+                btnText: "I have it!"
+            }
+        ];
+
+        function nextStep() {
+            const card = document.getElementById('hunt-card');
+
+            // Animate card out slightly
+            card.style.transform = 'scale(0.95) translateY(10px)';
+            card.style.opacity = '0";';
+
+            setTimeout(() => {
+                if (step < 3) {
+                    document.getElementById('dots').style.display = 'flex';
+                    if (step > 0) document.getElementById(`dot${step + 1}`).classList.add('active');
+
+                    document.getElementById('h-icon').innerHTML = `<i class="ph-duotone ${steps[step].icon}"></i>`;
+                    document.getElementById('h-title').innerText = steps[step].title;
+                    document.getElementById('h-desc').innerText = steps[step].desc;
+                    document.getElementById('h-btn').innerText = steps[step].btnText;
+
+                    step++;
+                } else {
+                    // Finished
+                    document.getElementById('h-icon').innerHTML = `<i class="ph-fill ph-heart" style="color: #FF5A5F;"></i>`;
+                    document.getElementById('h-title').innerText = "Beautiful.";
+                    document.getElementById('h-desc').innerText = "By focusing on what's physically around you, your brain just proved that it is safe, right here, right now.";
+
+                    const btn = document.getElementById('h-btn');
+                    btn.innerText = "Return Home";
+                    btn.onclick = () => window.location.href = 'wellbeing-hub.html';
+
+                    document.getElementById('dots').style.display = 'none';
+
+                    // Fire Confetti
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#E0CBE6', '#9CBFA7', '#FFB3B3']
+                    });
+                }
+
+                // Animate card back
+                card.style.transform = 'scale(1) translateY(0)';
+                card.style.opacity = '1';
+            }, 300);
+        }
+    </script>
+</body>
+
+</html>

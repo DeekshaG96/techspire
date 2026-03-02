@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Energy Check-in - Aura</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-cream: #FDFBF7;
+            --sage-green: #9CBFA7;
+            --pastel-lavender: #E0CBE6;
+            --text-dark: #373F41;
+            --text-muted: #828B8E;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            background: #fff;
+            color: var(--text-dark);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .question-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            text-align: center;
+        }
+
+        .q-icon {
+            font-size: 3rem;
+            color: var(--pastel-lavender);
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: var(--bg-cream);
+            border: 2px solid transparent;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--sage-green);
+            background: #fff;
+        }
+
+        /* Results Screen */
+        .result-card {
+            display: none;
+            text-align: center;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            color: var(--sage-green);
+            margin-bottom: 20px;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: #fff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 30px;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="wellbeing-hub.html" class="back-btn"><i class="ph ph-arrow-left"></i></a>
+        <h1>Energy Check-in</h1>
+    </header>
+
+    <div class="container" id="quiz-container">
+
+        <!-- Question 1 -->
+        <div class="question-card" id="q1">
+            <div class="q-icon"><i class="ph-duotone ph-battery-warning"></i></div>
+            <div class="question-text">How does your body feel right now?</div>
+            <div class="options">
+                <button class="opt-btn" onclick="nextQ(1, 'low')">Heavy and sluggish</button>
+                <button class="opt-btn" onclick="nextQ(1, 'mid')">A bit tense, but okay</button>
+                <button class="opt-btn" onclick="nextQ(1, 'high')">Light and energetic</button>
+            </div>
+        </div>
+
+        <!-- Question 2 (Hidden) -->
+        <div class="question-card" id="q2" style="display:none;">
+            <div class="q-icon"><i class="ph-duotone ph-brain"></i></div>
+            <div class="question-text">How is your focus?</div>
+            <div class="options">
+                <button class="opt-btn" onclick="nextQ(2, 'low')">My mind keeps wandering</button>
+                <button class="opt-btn" onclick="nextQ(2, 'mid')">I can focus in short bursts</button>
+                <button class="opt-btn" onclick="nextQ(2, 'high')">Sharp and clear</button>
+            </div>
+        </div>
+
+        <!-- Question 3 (Hidden) -->
+        <div class="question-card" id="q3" style="display:none;">
+            <div class="q-icon"><i class="ph-duotone ph-plant"></i></div>
+            <div class="question-text">What do you feel you need most?</div>
+            <div class="options">
+                <button class="opt-btn" onclick="showResult('rest')">To close my eyes for a bit</button>
+                <button class="opt-btn" onclick="showResult('move')">To shake out this stiffness</button>
+                <button class="opt-btn" onclick="showResult('focus')">A good challenge</button>
+            </div>
+        </div>
+
+        <!-- Result -->
+        <div class="result-card" id="result-screen">
+            <div class="result-icon" id="r-icon"><i class="ph-fill ph-moon-stars"></i></div>
+            <h2 id="r-title" style="margin: 0 0 10px;">Power Nap</h2>
+            <p id="r-desc" style="color: var(--text-muted); line-height: 1.5;">Your body and mind are asking for a
+                break. Set a timer for 20 minutes, close your eyes, and let go.</p>
+            <a href="wellbeing-hub.html" class="btn-primary">Return Home</a>
+        </div>
+
+    </div>
+
+    <script>
+        // Simple logic for the quiz flows
+        let score = 0; // Negative for low energy, positive for high
+
+        function nextQ(current, value) {
+            if (value === 'low') score -= 1;
+            if (value === 'high') score += 1;
+
+            document.getElementById(`q${current}`).style.display = 'none';
+            document.getElementById(`q${current + 1}`).style.display = 'block';
+        }
+
+        function showResult(finalChoice) {
+            document.getElementById('q3').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+
+            const rTitle = document.getElementById('r-title');
+            const rDesc = document.getElementById('r-desc');
+            const rIcon = document.getElementById('r-icon');
+
+            if (finalChoice === 'rest' || score < -1) {
+                rIcon.innerHTML = '<i class="ph-fill ph-moon-stars"></i>';
+                rTitle.innerText = "Recharge: Power Nap";
+                rDesc.innerText = "Your body and mind are asking for a break. Give yourself permission to disconnect for 20 minutes. It's not lazy; it's necessary maintenance.";
+            } else if (finalChoice === 'move' || score === 0) {
+                rIcon.innerHTML = '<i class="ph-fill ph-sneaker"></i>';
+                rTitle.innerText = "Refresh: Take a Walk";
+                rDesc.innerText = "You have stagnant energy. A quick 10-minute walk outside or some gentle stretching will hit the reset button on your brain.";
+            } else {
+                rIcon.innerHTML = '<i class="ph-fill ph-flame"></i>';
+                rTitle.innerText = "Flow: Deep Focus";
+                rDesc.innerText = "You're in a great state! Capitalize on this energy. Pick your most important task, put on a focus playlist, and dive in.";
+            }
+        }
+    </script>
+</body>
+
+</html>
