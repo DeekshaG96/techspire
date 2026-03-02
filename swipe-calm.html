@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SwipeCalm – Mental Reset</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            --sage: #9CBFA7;
+            --lavender: #DCD0FF;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            text-align: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            transition: background 1s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .glass-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #444;
+            text-decoration: none;
+            box-shadow: var(--glass-shadow);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .glass-btn:active {
+            transform: scale(0.9);
+        }
+
+        .glass-pill {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 80px;
+            position: relative;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+
+        p.subtitle {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 90%;
+            max-width: 500px;
+            min-height: 250px;
+            position: relative;
+        }
+
+        .bubble {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 16px 28px;
+            margin: 12px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #4a4a4a;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bubble i {
+            color: #888;
+        }
+
+        .bubble:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+
+        .fade-out {
+            transform: translateX(350px) scale(0.5) rotate(15deg) !important;
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
+        .fade-out-left {
+            transform: translateX(-350px) scale(0.5) rotate(-15deg) !important;
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
+        /* Motivation Popup */
+        #motivationPopup {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            color: #333;
+            padding: 20px 30px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-style: italic;
+            box-shadow: var(--glass-shadow);
+            opacity: 0;
+            transition: all 0.5s ease;
+            pointer-events: none;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        #motivationPopup.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="wellbeing-hub.html" class="glass-btn"><i class="ph ph-arrow-left"></i></a>
+        <div class="glass-pill"><i class="ph-fill ph-hand-swipe-right"></i> SwipeCalm</div>
+    </header>
+
+    <div class="main-content">
+        <h2 id="mainTitle">Swipe Away Negative Thoughts</h2>
+        <p class="subtitle" id="mainSub">Swipe left or right to release what isn't serving you.</p>
+
+        <div id="motivationPopup">Motivation goes here</div>
+
+        <div class="container" id="container">
+            <!-- Injected via JS -->
+        </div>
+    </div>
+
+    <script>
+        const negativeThoughts = [
+            { text: "Stress", icon: "ph-wind" },
+            { text: "Anxiety", icon: "ph-lightning" },
+            { text: "Overthinking", icon: "ph-brain" },
+            { text: "Self Doubt", icon: "ph-question" },
+            { text: "Fear", icon: "ph-warning-circle" }
+        ];
+
+        const positiveThoughts = [
+            { text: "Calm", icon: "ph-coffee" },
+            { text: "Peace", icon: "ph-dove" },
+            { text: "Hope", icon: "ph-star" },
+            { text: "Strength", icon: "ph-barbell" },
+            { text: "Focus", icon: "ph-target" }
+        ];
+
+        const motivationalQuotes = [
+            "Let it go. You are safe.",
+            "Breathe in peace, breathe out tension.",
+            "You are stronger than this feeling.",
+            "Every swipe creates space for light.",
+            "You're doing great. Keep releasing.",
+            "This thought does not control you."
+        ];
+
+        const finalQuotes = [
+            "Your mind is now a clear, open sky.",
+            "Notice the quiet. You created this.",
+            "You have restored your balance."
+        ];
+
+        let startX = 0;
+        let isPositivePhase = false;
+
+        function initBubbles(items) {
+            const container = document.getElementById("container");
+            container.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.innerHTML = `<i class="ph-fill ${item.icon}"></i> ${item.text}`;
+                // Staggered entrance animation
+                bubble.style.opacity = '0';
+                bubble.style.transform = 'translateY(20px)';
+                container.appendChild(bubble);
+
+                setTimeout(() => {
+                    bubble.style.opacity = '1';
+                    bubble.style.transform = 'translateY(0)';
+                }, index * 100);
+
+                addSwipeEvents(bubble);
+            });
+        }
+
+        function addSwipeEvents(bubble) {
+            let isDragging = false;
+            let currentX = 0;
+
+            const handleStart = (e) => {
+                isDragging = true;
+                startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                bubble.style.transition = 'none';
+            };
+
+            const handleMove = (e) => {
+                if (!isDragging) return;
+                currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                let diff = currentX - startX;
+                // Add slight resistance and rotation
+                bubble.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`;
+            };
+
+            const handleEnd = (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                let endX = e.type.includes('mouse') ? e.clientX : e.changedTouches[0].clientX;
+                bubble.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease';
+                handleSwipe(bubble, startX, endX);
+            };
+
+            // Touch
+            bubble.addEventListener("touchstart", handleStart, { passive: true });
+            bubble.addEventListener("touchmove", handleMove, { passive: true });
+            bubble.addEventListener("touchend", handleEnd);
+            // Mouse
+            bubble.addEventListener("mousedown", handleStart);
+            window.addEventListener("mousemove", handleMove);
+            window.addEventListener("mouseup", handleEnd);
+        }
+
+        function handleSwipe(bubble, start, end) {
+            let diff = end - start;
+
+            if (Math.abs(diff) > 80) {
+                // Swiped successfully
+                if (diff > 0) {
+                    bubble.classList.add("fade-out"); // Right
+                } else {
+                    bubble.classList.add("fade-out-left"); // Left
+                }
+
+                if (!isPositivePhase) {
+                    showQuickMotivation();
+                }
+
+                setTimeout(() => {
+                    bubble.remove();
+                    checkReset();
+                }, 400);
+            } else {
+                // Return to center
+                bubble.style.transform = `translateX(0px) rotate(0deg)`;
+            }
+        }
+
+        function showQuickMotivation() {
+            const popup = document.getElementById('motivationPopup');
+            popup.innerText = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            popup.classList.add('show');
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 1500);
+        }
+
+        function calmEffect() {
+            document.body.style.background = "linear-gradient(135deg, #d4fc79, #96e6a1)";
+            document.getElementById('mainTitle').innerText = "Embrace the Positives 🌿";
+            document.getElementById('mainSub').innerText = "Tap or swipe to collect these strengths.";
+            isPositivePhase = true;
+        }
+
+        function checkReset() {
+            const remaining = document.querySelectorAll(".bubble").length;
+            if (remaining === 0) {
+                if (!isPositivePhase) {
+                    setTimeout(() => {
+                        calmEffect();
+                        initBubbles(positiveThoughts);
+                    }, 500);
+                } else {
+                    // Complete!
+                    setTimeout(() => {
+                        const popup = document.getElementById('motivationPopup');
+                        popup.innerText = finalQuotes[Math.floor(Math.random() * finalQuotes.length)];
+                        popup.classList.add('show');
+
+                        // Gamification: Award point and confetti
+                        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                        let pts = parseInt(localStorage.getItem('zenPoints') || '0');
+                        localStorage.setItem('zenPoints', pts + 1);
+
+                        setTimeout(() => {
+                            popup.classList.remove('show');
+                            // Reset back to start state
+                            document.body.style.background = "linear-gradient(135deg, #a8edea, #fed6e3)";
+                            document.getElementById('mainTitle').innerText = "Swipe Away Negative Thoughts";
+                            document.getElementById('mainSub').innerText = "Swipe left or right to release what isn't serving you.";
+                            isPositivePhase = false;
+                            initBubbles(negativeThoughts);
+                        }, 4000);
+                    }, 300);
+                }
+            }
+        }
+
+        // Initialize
+        window.onload = () => {
+            initBubbles(negativeThoughts);
+        };
+
+    </script>
+</body>
+
+</html>
