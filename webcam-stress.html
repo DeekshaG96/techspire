@@ -251,22 +251,38 @@
 
         faceMesh.onResults(onResults);
 
-        // Start Camera
-        const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                // Ensure canvas matches video dims
-                canvasElement.width = videoElement.videoWidth;
-                canvasElement.height = videoElement.videoHeight;
-                await faceMesh.send({ image: videoElement });
-            },
-            width: 800,
-            height: 600
-        });
+        let lastFrameTime = 0;
 
-        camera.start().catch(err => {
-            console.error(err);
-            loader.innerHTML = `<i class="ph ph-warning" style="color: #FF5A5F;"></i> Camera Access Denied<br><small style="color:#aaa; font-size:0.8rem;">Please allow webcam permissions or check connection.</small>`;
-        });
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 800, height: 600 } });
+                videoElement.srcObject = stream;
+
+                // Once metadata is loaded, we can continuously poll for frames
+                videoElement.onloadedmetadata = () => {
+                    videoElement.play();
+
+                    canvasElement.width = videoElement.videoWidth;
+                    canvasElement.height = videoElement.videoHeight;
+
+                    processVideo();
+                };
+            } catch (err) {
+                console.error("Camera access error:", err);
+                loader.innerHTML = `<i class="ph ph-warning" style="color: #FF5A5F;"></i> Camera Access Denied<br><small style="color:#aaa; font-size:0.8rem;">${err.message || 'Please allow webcam permissions or check connection.'}</small>`;
+                hud.style.display = 'none';
+            }
+        }
+
+        async function processVideo() {
+            if (videoElement.currentTime !== lastFrameTime) {
+                lastFrameTime = videoElement.currentTime;
+                await faceMesh.send({ image: videoElement });
+            }
+            requestAnimationFrame(processVideo);
+        }
+
+        startCamera();
     </script>
 </body>
 
