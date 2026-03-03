@@ -251,38 +251,32 @@
 
         faceMesh.onResults(onResults);
 
-        let lastFrameTime = 0;
-
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 800, height: 600 } });
-                videoElement.srcObject = stream;
-
-                // Once metadata is loaded, we can continuously poll for frames
-                videoElement.onloadedmetadata = () => {
-                    videoElement.play();
-
-                    canvasElement.width = videoElement.videoWidth;
-                    canvasElement.height = videoElement.videoHeight;
-
-                    processVideo();
-                };
-            } catch (err) {
-                console.error("Camera access error:", err);
-                loader.innerHTML = `<i class="ph ph-warning" style="color: #FF5A5F;"></i> Camera Access Denied<br><small style="color:#aaa; font-size:0.8rem;">${err.message || 'Please allow webcam permissions or check connection.'}</small>`;
-                hud.style.display = 'none';
+        // Intercept MediaPipe window.alert for camera failures so it doesn't block the UI
+        const originalAlert = window.alert;
+        window.alert = function (msg) {
+            if (msg.includes("Failed to acquire camera feed")) {
+                loader.innerHTML = `<i class="ph ph-warning" style="color: #FF5A5F;"></i> Camera Access Denied<br><small style="color:#aaa; font-size:0.8rem;">Please allow webcam permissions to use Deep Vision.</small>`;
+            } else {
+                originalAlert(msg);
             }
-        }
+        };
 
-        async function processVideo() {
-            if (videoElement.currentTime !== lastFrameTime) {
-                lastFrameTime = videoElement.currentTime;
+        // Start Camera
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                // Ensure canvas matches video dims
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
                 await faceMesh.send({ image: videoElement });
-            }
-            requestAnimationFrame(processVideo);
-        }
+            },
+            width: 800,
+            height: 600
+        });
 
-        startCamera();
+        camera.start().catch(err => {
+            console.error(err);
+            loader.innerHTML = `<i class="ph ph-warning" style="color: #FF5A5F;"></i> Camera Error<br><small style="color:#aaa; font-size:0.8rem;">Could not initialize webcam.</small>`;
+        });
     </script>
 </body>
 
