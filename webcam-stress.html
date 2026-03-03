@@ -261,22 +261,48 @@
             }
         };
 
-        // Start Camera
-        const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                // Ensure canvas matches video dims
-                canvasElement.width = videoElement.videoWidth;
-                canvasElement.height = videoElement.videoHeight;
-                await faceMesh.send({ image: videoElement });
-            },
-            width: 800,
-            height: 600
-        });
+        // Manual robust camera initialization to prevent NotReadableError from strict constraints
+        let lastVideoTime = -1;
+        async function startDeepVisionCamera() {
+            try {
+                // Use adaptive constraints instead of forcing 800x600 which breaks some Windows cameras
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: "user"
+                    }
+                });
 
-        camera.start().catch(err => {
-            console.error(err);
-            loader.innerHTML = `<i class="ph ph-warning" style="color: #FF5A5F;"></i> Camera Error<br><small style="color:#aaa; font-size:0.8rem;">Could not initialize webcam.</small>`;
-        });
+                videoElement.srcObject = stream;
+
+                videoElement.onloadedmetadata = () => {
+                    videoElement.play();
+                    // Set canvas dims to match whatever resolution the camera actually provided
+                    canvasElement.width = videoElement.videoWidth;
+                    canvasElement.height = videoElement.videoHeight;
+                    requestAnimationFrame(processFrame);
+                };
+            } catch (err) {
+                console.error("Camera Access Error:", err);
+                let errMsg = "Please allow webcam permissions to use Deep Vision.";
+                if (err.name === "NotReadableError") errMsg = "Your camera is currently in use by another app (like Zoom or Teams) or blocked by Windows Privacy settings.";
+
+                loader.innerHTML = `<i class="ph ph-warning" style="color: #FF5A5F;"></i> Camera Access Denied<br><small style="color:#aaa; font-size:0.8rem;">${errMsg}</small>`;
+            }
+        }
+
+        async function processFrame() {
+            if (videoElement.readyState >= 2 && videoElement.videoWidth > 0) {
+                if (videoElement.currentTime !== lastVideoTime) {
+                    lastVideoTime = videoElement.currentTime;
+                    await faceMesh.send({ image: videoElement });
+                }
+            }
+            requestAnimationFrame(processFrame);
+        }
+
+        startDeepVisionCamera();
     </script>
 </body>
 
