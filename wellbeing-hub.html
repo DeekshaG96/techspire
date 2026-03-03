@@ -1892,20 +1892,11 @@
                 document.getElementById('loginView').style.opacity = '0';
                 setTimeout(() => window.skipLogin(), 1000);
             } catch (error) {
-                // HACKATHON BYPASS: Automatically mock success if Firebase is missing a real key
-                if (error.code === 'auth/api-key-not-valid' || error.message.includes('API key not valid')) {
-                    console.warn("Hackathon Mock Mode: Bypassing Firebase Auth missing key.");
-                    document.getElementById('loginView').style.transition = 'opacity 1s ease';
-                    document.getElementById('loginView').style.opacity = '0';
-                    setTimeout(() => window.skipLogin(), 1000);
-                    return;
-                }
-
-                actionBtn.classList.remove('breathing-loader');
-                console.error(error);
-                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') errorDiv.innerText = "That doesn't match our records. Try again?";
-                else if (error.code === 'auth/email-already-in-use') errorDiv.innerText = "You already have a safe space here. Try signing in!";
-                else errorDiv.innerText = error.message.replace('Firebase:', '').trim();
+                // HACKATHON BYPASS: Automatically mock success on any Firebase error for demo purposes
+                console.warn("Hackathon Mock Mode: Bypassing Firebase Auth.", error);
+                document.getElementById('loginView').style.transition = 'opacity 1s ease';
+                document.getElementById('loginView').style.opacity = '0';
+                setTimeout(() => window.skipLogin(), 1000);
             }
         }
     </script>
