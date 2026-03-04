@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mood Jar - Aura</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-cream: #FDFBF7;
+            --sage-green: #9CBFA7;
+            --pastel-lavender: #E0CBE6;
+            --text-dark: #373F41;
+
+            /* Mood Colors */
+            --mood-great: #FFD166;
+            /* Joy/Yellow */
+            --mood-good: #06D6A0;
+            /* Calm/Green */
+            --mood-okay: #118AB2;
+            /* Okay/Blue */
+            --mood-bad: #EF476F;
+            /* Stress/Red */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            font-family: 'Inter', system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: none;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: absolute;
+            top: 0;
+            z-index: 10;
+        }
+
+        .back-btn {
+            background: #fff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        /* Physics Canvas */
+        #jarCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            /* Let clicks pass to UI then handled by script if needed */
+        }
+
+        /* Mood Selection UI */
+        .mood-panel {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 20px 24px;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .mood-panel h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .mood-grid {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .mood-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mood-btn:active {
+            transform: scale(0.9);
+        }
+
+        .mood-btn span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 4px;
+            color: #fff;
+        }
+
+        .btn-great {
+            background: var(--mood-great);
+        }
+
+        .btn-good {
+            background: var(--mood-good);
+        }
+
+        .btn-okay {
+            background: var(--mood-okay);
+        }
+
+        .btn-bad {
+            background: var(--mood-bad);
+        }
+
+        /* Clear button */
+        .clear-btn {
+            position: absolute;
+            bottom: -15px;
+            right: -15px;
+            background: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        /* SVG overlay for the jar outline */
+        .jar-outline {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 260px;
+            height: 320px;
+            pointer-events: none;
+            z-index: 5;
+            border: 8px solid rgba(255, 255, 255, 0.7);
+            border-top: none;
+            border-radius: 0 0 40px 40px;
+            box-shadow: inset 0 -20px 40px rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .jar-lip {
+            position: absolute;
+            top: -10px;
+            left: -15px;
+            width: 290px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+    </style>
+    <!-- Include Matter.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <a href="wellbeing-hub.html" class="back-btn"><i class="ph ph-arrow-left"></i></a>
+        <h1>Daily Mood Jar</h1>
+    </header>
+
+    <div class="jar-outline">
+        <div class="jar-lip"></div>
+    </div>
+
+    <div id="jarCanvas"></div>
+
+    <div class="mood-panel">
+        <h3>How are you feeling?</h3>
+        <div class="mood-grid">
+            <button class="mood-btn btn-great" onclick="addMarble('great')">😄</button>
+            <button class="mood-btn btn-good" onclick="addMarble('good')">😌</button>
+            <button class="mood-btn btn-okay" onclick="addMarble('okay')">😐</button>
+            <button class="mood-btn btn-bad" onclick="addMarble('bad')">🌧️</button>
+        </div>
+        <button class="clear-btn" onclick="clearJar()" title="Empty Jar"><i class="ph ph-trash"></i></button>
+    </div>
+
+    <script>
+        // Setup Matter.js
+        const Engine = Matter.Engine,
+            Render = Matter.Render,
+            Runner = Matter.Runner,
+            Bodies = Matter.Bodies,
+            Composite = Matter.Composite,
+            MouseConstraint = Matter.MouseConstraint,
+            Mouse = Matter.Mouse;
+
+        const engine = Engine.create();
+        const cw = window.innerWidth;
+        const ch = window.innerHeight;
+
+        const render = Render.create({
+            element: document.getElementById('jarCanvas'),
+            engine: engine,
+            options: {
+                width: cw,
+                height: ch,
+                wireframes: false,
+                background: 'transparent'
+            }
+        });
+
+        // Jar geometry based on CSS position
+        // Center of screen, bottom aligned above UI
+        const jarCenterX = cw / 2;
+        const jarBottomY = ch - 150;
+        const jarWidth = 260;
+        const jarHeight = 320;
+        const wallThickness = 40;
+
+        // Static Bodies for the Jar
+        const ground = Bodies.rectangle(jarCenterX, jarBottomY + wallThickness / 2, jarWidth + wallThickness, wallThickness, { isStatic: true, render: { visible: false } });
+        const leftWall = Bodies.rectangle(jarCenterX - jarWidth / 2 - wallThickness / 2 + 4, jarBottomY - jarHeight / 2, wallThickness, jarHeight + wallThickness, { isStatic: true, render: { visible: false } });
+        const rightWall = Bodies.rectangle(jarCenterX + jarWidth / 2 + wallThickness / 2 - 4, jarBottomY - jarHeight / 2, wallThickness, jarHeight + wallThickness, { isStatic: true, render: { visible: false } });
+
+        Composite.add(engine.world, [ground, leftWall, rightWall]);
+
+        // Add mouse control so user can play with marbles
+        const mouse = Mouse.create(render.canvas);
+        const mConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.2,
+                render: { visible: false }
+            }
+        });
+        Composite.add(engine.world, mConstraint);
+        render.mouse = mouse;
+
+        Render.run(render);
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        // Mood colors mapping
+        const colors = {
+            'great': '#FFD166',
+            'good': '#06D6A0',
+            'okay': '#118AB2',
+            'bad': '#EF476F'
+        };
+
+        // Load saved marbles
+        let savedMarbles = JSON.parse(localStorage.getItem('moodMarbles')) || [];
+
+        // Stagger the loading drop
+        savedMarbles.forEach((type, index) => {
+            setTimeout(() => {
+                spawnMarble(type);
+            }, index * 100);
+        });
+
+        function addMarble(type) {
+            spawnMarble(type);
+
+            // Save to localStorage
+            savedMarbles.push(type);
+            localStorage.setItem('moodMarbles', JSON.stringify(savedMarbles));
+
+            // Gamification hook
+            let currentPts = parseInt(localStorage.getItem('zenPoints') || '0');
+            localStorage.setItem('zenPoints', currentPts + 1);
+        }
+
+        function spawnMarble(type) {
+            const marbleColor = colors[type];
+            // Drop from above the jar opening
+            const startX = jarCenterX + (Math.random() * 40 - 20); // slightly randomized X
+            const startY = jarBottomY - jarHeight - 50;
+
+            const marble = Bodies.circle(startX, startY, 20, {
+                restitution: 0.6, // bouncy
+                friction: 0.05,
+                density: 0.04,
+                render: {
+                    fillStyle: marbleColor,
+                    strokeStyle: '#ffffff',
+                    lineWidth: 2
+                }
+            });
+
+            Composite.add(engine.world, marble);
+        }
+
+        function clearJar() {
+            if (confirm("Are you sure you want to empty your mood jar?")) {
+                localStorage.removeItem('moodMarbles');
+                savedMarbles = [];
+                // Remove all non-static bodies (marbles)
+                const bodies = Composite.allBodies(engine.world);
+                bodies.forEach(body => {
+                    if (!body.isStatic) Composite.remove(engine.world, body);
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

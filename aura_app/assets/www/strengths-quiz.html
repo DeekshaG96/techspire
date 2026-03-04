@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Strengths Quiz - Aura</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-cream: #FDFBF7;
+            --sage-green: #9CBFA7;
+            --sage-green-light: #E8F0EA;
+            --pastel-lavender: #E0CBE6;
+            --text-dark: #373F41;
+            --text-muted: #828B8E;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            background: #fff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: var(--text-dark);
+            flex-shrink: 0;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question-card,
+        .result-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            display: none;
+            /* Hidden by default */
+        }
+
+        .q-num {
+            color: var(--sage-green);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: var(--bg-cream);
+            border: 2px solid transparent;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--pastel-lavender);
+            background: #fff;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--sage-green-light);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-inner {
+            height: 100%;
+            background: var(--sage-green);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Result */
+        .result-card {
+            text-align: center;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            color: var(--pastel-lavender);
+            margin-bottom: 20px;
+        }
+
+        .result-desc {
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background: var(--pastel-lavender);
+            color: #fff;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(224, 203, 230, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="wellbeing-hub.html" class="back-btn"><i class="ph ph-arrow-left"></i></a>
+        <h1>Strengths Quiz</h1>
+    </header>
+
+    <div class="container" id="quiz-container">
+
+        <div class="progress-bar">
+            <div class="progress-inner" id="pb"></div>
+        </div>
+
+        <!-- Questions -->
+        <div class="question-card" id="q0" style="display:block;">
+            <div class="q-num">Situation 1 of 3</div>
+            <div class="question-text">When a friend is going through a hard time, what is your natural reaction?</div>
+            <div class="options">
+                <button class="opt-btn" onclick="answer('empathy')">I listen to them without judging.</button>
+                <button class="opt-btn" onclick="answer('problem_solving')">I immediately try to think of
+                    solutions.</button>
+                <button class="opt-btn" onclick="answer('positivity')">I try to cheer them up and make them
+                    laugh.</button>
+            </div>
+        </div>
+
+        <div class="question-card" id="q1">
+            <div class="q-num">Situation 2 of 3</div>
+            <div class="question-text">If you have a free evening, what sounds most appealing?</div>
+            <div class="options">
+                <button class="opt-btn" onclick="answer('creativity')">Making something: art, cooking, writing.</button>
+                <button class="opt-btn" onclick="answer('curiosity')">Learning something: reading, watching a
+                    documentary.</button>
+                <button class="opt-btn" onclick="answer('connection')">Calling someone I care about just to
+                    chat.</button>
+            </div>
+        </div>
+
+        <div class="question-card" id="q2">
+            <div class="q-num">Situation 3 of 3</div>
+            <div class="question-text">When faced with a sudden, stressful change in plans, you...</div>
+            <div class="options">
+                <button class="opt-btn" onclick="answer('resilience')">Take a breath and figure out the next
+                    step.</button>
+                <button class="opt-btn" onclick="answer('perspective')">Realize it won't matter in 5 years.</button>
+                <button class="opt-btn" onclick="answer('adaptability')">Excitedly embrace the new surprise.</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="result-card" id="result-screen">
+            <div class="result-icon"><i id="r-icon" class="ph-duotone ph-star"></i></div>
+            <h2 id="r-title" style="margin: 0 0 10px;">Your Strength</h2>
+            <div class="result-desc" id="r-desc">Calculating...</div>
+            <a href="wellbeing-hub.html" class="btn-primary">Back to Hub</a>
+        </div>
+
+    </div>
+
+    <script>
+        let currentQ = 0;
+        const totalQ = 3;
+
+        // Simple logic: we just pick the last trait they clicked to highlight it 
+        // positive reinforcement doesn't need to be complex 
+
+        const traits = {
+            'empathy': { icon: 'ph-heart', title: 'Deep Empathy', desc: 'You have a beautiful ability to hold space for others. This is a rare and powerful gift that makes people feel safe.' },
+            'problem_solving': { icon: 'ph-lightbulb', title: 'Strategic Mind', desc: 'You turn chaos into order. When things go wrong, you are the grounded anchor people rely on for a plan.' },
+            'positivity': { icon: 'ph-sun', title: 'Radiant Positivity', desc: 'You bring light to dark rooms. Cultivating joy in hard times is true strength.' },
+            'creativity': { icon: 'ph-palette', title: 'Creative Soul', desc: 'You see the world not just as it is, but as it could be. This allows you to build beauty out of nothing.' },
+            'curiosity': { icon: 'ph-magnifying-glass', title: 'Endless Curiosity', desc: 'Your mind is always growing. Your desire to understand the world keeps your spirit incredibly young.' },
+            'connection': { icon: 'ph-users', title: 'Connector', desc: 'You understand that humans need each other. You are the glue that holds communities and friendships together.' },
+            'resilience': { icon: 'ph-anchor', title: 'Quiet Resilience', desc: 'You bend, but you do not break. Your ability to withstand storms and keep moving forward is inspiring.' },
+            'perspective': { icon: 'ph-binoculars', title: 'Wise Perspective', desc: 'You don\'t get lost in the weeds. You see the big picture, which shields you from unnecessary anxiety.' },
+            'adaptability': { icon: 'ph-waves', title: 'Fluid Adaptability', desc: 'You move like water. Instead of fighting reality, you conform to it and effortlessly find a new path.' }
+        };
+
+        function answer(traitKey) {
+            document.getElementById(`q${currentQ}`).style.display = 'none';
+            currentQ++;
+
+            // Update progress
+            document.getElementById('pb').style.width = `${(currentQ / totalQ) * 100}%`;
+
+            if (currentQ < totalQ) {
+                document.getElementById(`q${currentQ}`).style.display = 'block';
+            } else {
+                showResult(traitKey); // We just use the final answer for the 'highlight' strength
+            }
+        }
+
+        function showResult(traitKey) {
+            const result = traits[traitKey];
+
+            document.getElementById('r-icon').className = `ph-duotone ${result.icon}`;
+            document.getElementById('r-title').innerText = result.title;
+            document.getElementById('r-desc').innerText = result.desc;
+
+            setTimeout(() => {
+                document.getElementById('result-screen').style.display = 'block';
+            }, 300); // Small delay for effect
+        }
+    </script>
+</body>
+
+</html>

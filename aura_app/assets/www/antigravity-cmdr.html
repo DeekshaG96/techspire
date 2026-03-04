@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Antigravity - Grounding Prototype</title>
+    <!-- Include p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #05050A;
+            /* Deep calm aesthetic */
+            color: #fff;
+            font-family: 'Inter', system-ui, sans-serif;
+            overflow-x: hidden;
+            /* Allow scrolling initially to detect frantic scrolling, but hide scrollbar */
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* The pseudo-content to allow scrolling */
+        #scroll-content {
+            height: 300vh;
+            /* Make page scrollable */
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
+        }
+
+        #home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        #home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            /* Allow drag events to pass when active */
+            touch-action: none;
+        }
+
+        #instruction {
+            position: fixed;
+            bottom: 40px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 1s, color 1s;
+        }
+
+        .success-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(120, 255, 180, 0.2) 0%, transparent 70%);
+            z-index: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .success-flash.active {
+            animation: successGlow 2s ease-out forwards;
+        }
+
+        @keyframes successGlow {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            20% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html" id="home-btn" title="Return Home">🏠</a>
+
+    <div id="scroll-content"></div>
+    <div id="canvas-container"></div>
+    <div id="instruction">Scroll down...</div>
+    <div class="success-flash" id="successFx"></div>
+
+    <script>
+        // --- LOGIC LAYER (Vanilla JS + p5.js) ---
+
+        // 1. Scroll Detection State
+        let lastScrollY = window.scrollY;
+        let lastScrollTime = Date.now();
+        let scrollVelocity = 0;
+        let franticThreshold = 3000; // Pixels per second to trigger Antigravity
+
+        // 2. Physics & Interaction State
+        let isAntiGravity = false;
+        let particles = [];
+        let gravityForce = 0.5;
+
+        // Grounding Pad
+        let padX, padY, padRadius;
+        // Weight Icon
+        let weightX, weightY, weightRadius;
+        let isDragging = false;
+        let isStabilized = false;
+
+        function setup() {
+            let canvas = createCanvas(windowWidth, windowHeight);
+            canvas.parent('canvas-container');
+
+            // Initialize dimensions
+            padRadius = min(width, height) * 0.15;
+            padX = width / 2;
+            padY = height / 2;
+
+            weightRadius = 40;
+            weightX = width / 2;
+            weightY = height - 100; // Starts near the bottom hidden
+
+            // Spawn UI elements / text chunks as particles
+            for (let i = 0; i < 25; i++) {
+                particles.push(new UIParticle(random(width), random(height)));
+            }
+
+            // Bind Scroll Event purely to calculate velocity
+            window.addEventListener('scroll', calculateScrollVelocity);
+        }
+
+        function calculateScrollVelocity() {
+            if (isAntiGravity || isStabilized) return; // Ignore scroll if already triggered
+
+            let currentScrollY = window.scrollY;
+            let currentTime = Date.now();
+            let timeDiff = (currentTime - lastScrollTime) / 1000; // in seconds
+
+            if (timeDiff > 0) {
+                let distance = Math.abs(currentScrollY - lastScrollY);
+                scrollVelocity = distance / timeDiff;
+
+                if (scrollVelocity > franticThreshold) {
+                    triggerAntiGravity();
+                }
+            }
+
+            lastScrollY = currentScrollY;
+            lastScrollTime = currentTime;
+        }
+
+        function triggerAntiGravity() {
+            isAntiGravity = true;
+            document.body.style.overflow = 'hidden'; // Lock scrolling
+            document.getElementById('instruction').innerText = "Hold the Weight. Pull it to the center.";
+            document.getElementById('instruction').style.color = "#FF7E5F"; // Alert color
+
+            // Activate physics burst
+            particles.forEach(p => {
+                p.vel.y = random(-2, -5); // Initial updraft kick
+            });
+
+            // Reveal the Weight
+            weightX = width / 2;
+            weightY = height - 100;
+        }
+
+        function draw() {
+            clear(); // For transparency
+
+            if (isAntiGravity && !isStabilized) {
+                gravityForce = -0.05; // Elements drift upward
+                drawGroundingPad();
+                drawWeight();
+                checkGroundingLogic();
+            } else if (isStabilized) {
+                gravityForce = 0.4; // Gentle floating down
+            } else {
+                gravityForce = 0; // Frozen state before frantic scrolling
+            }
+
+            // Update UI Particles
+            particles.forEach(p => {
+                if (isAntiGravity || isStabilized) {
+                    p.applyForce(createVector(0, gravityForce));
+                    p.update();
+                }
+                p.display();
+            });
+        }
+
+        // --- Interaction Logic ---
+        function drawGroundingPad() {
+            push();
+            noFill();
+            stroke(255, 255, 255, 50);
+            strokeWeight(2);
+            drawingContext.setLineDash([10, 15]);
+
+            // Pulse effect
+            let pulse = padRadius + sin(frameCount * 0.05) * 10;
+            ellipse(padX, padY, pulse * 2);
+
+            noStroke();
+            fill(255, 255, 255, 20);
+            textAlign(CENTER, CENTER);
+            textSize(14);
+            text("GROUND HERE", padX, padY);
+            pop();
+        }
+
+        function drawWeight() {
+            push();
+            if (isDragging) {
+                fill(255, 126, 95); // Active drag color
+            } else {
+                fill(200);
+            }
+            noStroke();
+            // Weight shape
+            rectMode(CENTER);
+            rect(weightX, weightY, weightRadius * 1.5, weightRadius * 1.5, 8);
+
+            fill(20);
+            textSize(18);
+            textAlign(CENTER, CENTER);
+            text("⚓", weightX, weightY);
+            pop();
+        }
+
+        function mousePressed() {
+            if (!isAntiGravity || isStabilized) return;
+            let d = dist(mouseX, mouseY, weightX, weightY);
+            if (d < weightRadius) {
+                isDragging = true;
+            }
+        }
+
+        function mouseDragged() {
+            if (isDragging) {
+                weightX = mouseX;
+                weightY = mouseY;
+            }
+        }
+
+        function mouseReleased() {
+            isDragging = false;
+            checkGroundingLogic();
+        }
+
+        function touchStarted() { mousePressed(); }
+        function touchMoved() { mouseDragged(); }
+        function touchEnded() { mouseReleased(); }
+
+        function checkGroundingLogic() {
+            if (!isDragging) {
+                let d = dist(weightX, weightY, padX, padY);
+                if (d < padRadius) {
+                    // Success! The weight is in the pad.
+                    triggerSuccess();
+                } else if (isAntiGravity && weightY < height) {
+                    // Weight falls back down if dropped outside pad
+                    weightY += 5;
+                }
+            }
+        }
+
+        function triggerSuccess() {
+            isStabilized = true;
+            isAntiGravity = false;
+            weightX = padX;
+            weightY = padY; // Lock it to center
+
+            document.getElementById('successFx').classList.add('active');
+            document.getElementById('instruction').innerText = "Gravity Restored. Breathe.";
+            document.getElementById('instruction').style.color = "rgba(120, 255, 180, 0.8)";
+
+            // Haptic feedback
+            if (navigator.vibrate) navigator.vibrate([50, 50, 100]);
+        }
+
+        // --- Visual Elements ---
+        class UIParticle {
+            constructor(x, y) {
+                this.pos = createVector(x, y);
+                this.vel = createVector(0, 0);
+                this.acc = createVector(0, 0);
+                this.w = random(40, 150);
+                this.h = random(10, 20);
+                this.opacity = random(30, 80);
+                // Fake text lines
+                this.type = random() > 0.8 ? 'img' : 'text';
+            }
+
+            applyForce(force) {
+                // Add slight chaotic drift in antigravity
+                if (gravityForce < 0) {
+                    force.add(createVector(random(-0.02, 0.02), 0));
+                }
+                this.acc.add(force);
+            }
+
+            update() {
+                this.vel.add(this.acc);
+                // Terminal velocity to prevent flying off instantly
+                this.vel.limit(isStabilized ? 3 : 5);
+                this.pos.add(this.vel);
+                this.acc.mult(0); // clear forces
+
+                // Wrap around edges dynamically
+                if (this.pos.y < -50) this.pos.y = height + 50;
+                if (this.pos.y > height + 50) this.pos.y = -50;
+                if (this.pos.x < -100) this.pos.x = width + 100;
+                if (this.pos.x > width + 100) this.pos.x = -100;
+            }
+
+            display() {
+                noStroke();
+                fill(255, 255, 255, this.opacity);
+                if (this.type === 'text') {
+                    rectMode(CORNER);
+                    rect(this.pos.x, this.pos.y, this.w, this.h, 4);
+                } else {
+                    ellipse(this.pos.x, this.pos.y, this.w * 0.5, this.w * 0.5);
+                }
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            padX = width / 2;
+            padY = height / 2;
+        }
+    </script>
+</body>
+
+</html>

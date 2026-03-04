@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frictionless Stress Dissolver</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050510;
+            font-family: 'Inter', system-ui, sans-serif;
+            touch-action: none;
+            /* Prevent scrolling on mobile */
+        }
+
+        #message-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #a0e8cf;
+            font-size: 2rem;
+            font-weight: 300;
+            opacity: 0;
+            transition: opacity 3s ease-in-out;
+            pointer-events: none;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(160, 232, 207, 0.2) 0%, rgba(160, 232, 207, 0) 70%);
+            border: 1px solid rgba(160, 232, 207, 0.5);
+            animation: breathe 10s infinite ease-in-out;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        @keyframes breathe {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+        }
+
+        .show-circle {
+            opacity: 1 !important;
+        }
+
+        /* Home Button */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+    </style>
+    <!-- Include p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+
+<body>
+    <a href="index.html" class="home-btn" title="Return Home">🏠</a>
+
+    <div id="message-container">
+        <div id="message-text">Exhale with the circle.</div>
+        <div class="breathing-circle" id="circle"></div>
+    </div>
+    <script>
+        let particles = [];
+        let numParticles = 150;
+        let globalVelocityMultiplier = 1.0;
+        let agitationLevel = 1.0; // 1.0 = highly agitated, 0.0 = calm
+        let swirlEnergy = 0;
+        let isCalm = false;
+
+        // Interaction variables
+        let prevTouchX = 0, prevTouchY = 0;
+
+        // Audio & SOS variables
+        let audioCtx;
+        let brownNoiseNode;
+        let gainNode;
+        let audioInitialized = false;
+
+        let tapTimes = [];
+        let sosMode = false;
+
+        // Antigravity drift
+        let gyroForce;
+
+        function initAudio() {
+            if (audioInitialized) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = buffer.getChannelData(0);
+            let lastOut = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                let white = Math.random() * 2 - 1;
+                output[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = output[i];
+                output[i] *= 3.5;
+            }
+            brownNoiseNode = audioCtx.createBufferSource();
+            brownNoiseNode.buffer = buffer;
+            brownNoiseNode.loop = true;
+
+            gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0;
+
+            brownNoiseNode.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            brownNoiseNode.start();
+            audioInitialized = true;
+        }
+
+        function checkSOS() {
+            const now = millis();
+            tapTimes.push(now);
+            tapTimes = tapTimes.filter(t => now - t < 2000);
+            if (tapTimes.length >= 4) {
+                sosMode = true;
+                if (gainNode) {
+                    gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+                }
+                const msgText = document.getElementById('message-text');
+                msgText.innerText = "Focus here.";
+                msgText.style.color = "#ffffff";
+                msgText.style.fontSize = "1.5rem";
+
+                const circle = document.getElementById('circle');
+                circle.style.animation = "none";
+                circle.style.background = "#ffffff";
+                circle.style.width = "12px";
+                circle.style.height = "12px";
+                circle.style.margin = "0 auto";
+                circle.classList.add('show-circle');
+
+                document.getElementById('message-container').style.opacity = '1';
+                particles = []; // Clear visual field
+            }
+        }
+
+        function mousePressed() {
+            if (!sosMode) {
+                initAudio();
+                checkSOS();
+            }
+        }
+        function touchStarted() {
+            if (!sosMode) {
+                initAudio();
+                checkSOS();
+            }
+        }
+
+        window.addEventListener('deviceorientation', function (e) {
+            let tiltX = constrain(e.gamma, -90, 90);
+            let tiltY = constrain(e.beta, -90, 90);
+
+            let forceX = map(tiltX, -90, 90, -1.0, 1.0);
+            let forceY = map(tiltY, -90, 90, -1.0, 1.0);
+            gyroForce = createVector(forceX, forceY);
+        });
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+            gyroForce = createVector(0, 0);
+        }
+
+        function draw() {
+            if (sosMode) {
+                background(5, 5, 16);
+                return;
+            }
+
+            // Optional: modulate audio based on agitation
+            if (audioInitialized && gainNode) {
+                let targetVol = map(agitationLevel, 0, 1, 0.05, 0.8);
+                gainNode.gain.setTargetAtTime(targetVol, audioCtx.currentTime, 0.2);
+            }
+
+            // Fading background for trails
+            background(5, 5, 16, 40);
+
+            // Calculate interaction velocity for "swirl" detection
+            let currentX = mouseIsPressed || touches.length > 0 ? (mouseX || (touches[0] ? touches[0].x : 0)) : 0;
+            let currentY = mouseIsPressed || touches.length > 0 ? (mouseY || (touches[0] ? touches[0].y : 0)) : 0;
+
+            let interactionActive = mouseIsPressed || touches.length > 0;
+            let interactionVel = 0;
+
+            if (interactionActive && prevTouchX !== 0 && prevTouchY !== 0) {
+                interactionVel = dist(currentX, currentY, prevTouchX, prevTouchY);
+            }
+
+            if (interactionActive) {
+                prevTouchX = currentX;
+                prevTouchY = currentY;
+
+                // If swirling, increase energy. We want a smooth, constant motion.
+                if (interactionVel > 2 && interactionVel < 80) {
+                    swirlEnergy += 0.015;
+                }
+            } else {
+                prevTouchX = 0;
+                prevTouchY = 0;
+                swirlEnergy -= 0.005; // Decay when not interacting
+            }
+
+            swirlEnergy = constrain(swirlEnergy, 0, 1);
+
+            // Agitation level drops as swirl energy is maintained
+            if (swirlEnergy > 0.3) {
+                agitationLevel -= 0.004; // Calm down over time
+            } else {
+                agitationLevel += 0.002; // Slowly get agitated again if left alone
+            }
+            agitationLevel = constrain(agitationLevel, 0, 1);
+
+            // Update global velocity based on agitation
+            globalVelocityMultiplier = map(agitationLevel, 0, 1, 0.1, 2.5);
+
+            // Check if calm state is reached
+            if (agitationLevel < 0.15 && !isCalm) {
+                isCalm = true;
+                document.getElementById('message-container').style.opacity = '1';
+                document.getElementById('circle').classList.add('show-circle');
+            } else if (agitationLevel > 0.35 && isCalm) {
+                isCalm = false;
+                document.getElementById('message-container').style.opacity = '0';
+                document.getElementById('circle').classList.remove('show-circle');
+            }
+
+            for (let p of particles) {
+                p.applyForceFromInteraction(currentX, currentY, interactionActive);
+                p.update();
+                p.display();
+            }
+        }
+
+        class Particle {
+            constructor() {
+                this.pos = createVector(random(width), random(height));
+                this.vel = p5.Vector.random2D().mult(random(2, 5));
+                this.acc = createVector(0, 0);
+                this.baseSize = random(4, 15);
+                this.mass = this.baseSize * 0.8; // Heavy physics
+                this.maxSpeed = random(4, 9);
+            }
+
+            applyForceFromInteraction(ix, iy, isActive) {
+                if (isActive || swirlEnergy > 0.1) {
+                    let interactionPos = createVector(ix, iy);
+                    let force = p5.Vector.sub(this.pos, interactionPos);
+                    let distance = force.mag();
+
+                    if (distance < 250) {
+                        // Improved radial orbit algorithm
+                        let dirToCenter = force.copy().normalize();
+
+                        // Create tangent for orbit (cross product essentially in 2D)
+                        let tangent = createVector(-dirToCenter.y, dirToCenter.x);
+
+                        // If they are far, pull them in. If they are close, let them orbit.
+                        let pullStrength = map(distance, 0, 250, 0, 0.8);
+                        let orbitStrength = 2.5 * swirlEnergy;
+
+                        dirToCenter.mult(-pullStrength);
+                        tangent.mult(orbitStrength);
+
+                        this.acc.add(dirToCenter);
+                        this.acc.add(tangent);
+                    }
+                }
+            }
+
+            update() {
+                // High agitation adds chaotic jitter
+                if (agitationLevel > 0.5) {
+                    let jitter = p5.Vector.random2D().mult(agitationLevel * 1.5);
+                    this.acc.add(jitter);
+                }
+
+                if (gyroForce) {
+                    // Drift from device orientation
+                    this.acc.add(gyroForce);
+                }
+
+                this.vel.add(this.acc);
+                // Apply global limits constraint
+                this.vel.limit(this.maxSpeed * globalVelocityMultiplier);
+                this.pos.add(this.vel);
+                this.acc.mult(0); // Reset acceleration
+
+                // Add friction
+                this.vel.mult(0.96);
+
+                this.edges();
+            }
+
+            display() {
+                noStroke();
+                // Color mapping: Red/Orange -> Blue/Green
+                let r = map(agitationLevel, 0, 1, 30, 255);
+                let g = map(agitationLevel, 0, 1, 230, 100);
+                let b = map(agitationLevel, 0, 1, 255, 50);
+                let alpha = map(agitationLevel, 0, 1, 150, 255);
+
+                fill(r, g, b, alpha);
+
+                let currentSize = this.baseSize;
+                if (isCalm) {
+                    // Slight pulsing size linked to the breathing rhythm
+                    currentSize += sin(frameCount * 0.05 + this.pos.x) * 2;
+                }
+
+                ellipse(this.pos.x, this.pos.y, currentSize);
+            }
+
+            edges() {
+                if (this.pos.x > width + 20) this.pos.x = -20;
+                if (this.pos.x < -20) this.pos.x = width + 20;
+                if (this.pos.y > height + 20) this.pos.y = -20;
+                if (this.pos.y < -20) this.pos.y = height + 20;
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+
+</html>

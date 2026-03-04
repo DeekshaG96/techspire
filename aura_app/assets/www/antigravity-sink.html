@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Sink</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #020205;
+            /* Dark immersive canvas */
+            overflow: hidden;
+            touch-action: none;
+            /* Prevent scrolling/zooming */
+            font-family: system-ui, -apple-system, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            filter: url('#goo');
+            /* Magic metaball filter for viscous liquid */
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Hidden SVG for gooey CSS filters */
+        .svg-filters {
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        #breathing-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 200, 255, 0.4);
+            background: radial-gradient(circle, rgba(0, 250, 255, 0.08) 0%, rgba(0, 200, 255, 0) 70%);
+            pointer-events: none;
+            opacity: 0;
+            z-index: 2;
+            transition: opacity 2s ease-in-out;
+            box-shadow: 0 0 50px rgba(0, 200, 255, 0.1);
+        }
+
+        /* The Clinical 4-7-8 Rhythm */
+        #breathing-guide.visible {
+            opacity: 1;
+            /* 4s inhale, 7s hold, 8s exhale = 19s total */
+            animation: breathe478 19s infinite linear;
+        }
+
+        @keyframes breathe478 {
+            0% {
+                transform: translate(-50%, -50%) scale(0.6);
+                opacity: 0.2;
+            }
+
+            21% {
+                transform: translate(-50%, -50%) scale(1.4);
+                opacity: 0.9;
+            }
+
+            /* 4s Inhale complete (~21%) */
+            58% {
+                transform: translate(-50%, -50%) scale(1.4);
+                opacity: 0.9;
+            }
+
+            /* 7s Hold complete (~58%) */
+            100% {
+                transform: translate(-50%, -50%) scale(0.6);
+                opacity: 0.2;
+            }
+
+            /* 8s Exhale complete */
+        }
+
+        #instruction {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 1s;
+        }
+
+        .hidden-text {
+            opacity: 0 !important;
+        }
+
+        /* Home Button */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+    </style>
+    <!-- Include p5.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+
+<body>
+    <a href="index.html" class="home-btn" title="Return Home">🏠</a>
+
+    <div id="instruction">Swirl to Calm</div>
+    <div id="canvas-container"></div>
+    <div id="breathing-guide"></div>
+
+    <!-- SVG filter definition for the metaball effect -->
+    <svg class="svg-filters">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"
+                    result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+            </filter>
+        </defs>
+    </svg>
+
+    <script>
+        let particles = [];
+        const numParticles = 90; // 80-100 viscous stress particles
+        let agitationLevel = 1.0; // 1.0 = Agitated, 0.0 = Harmonic
+        let isCalm = false;
+
+        let prevX = 0, prevY = 0;
+
+        // Accelerometer for Hardware Shake Integration
+        let shakeThreshold = 18;
+        let lastAcc = { x: null, y: null, z: null };
+        let permissionGranted = false;
+
+        function setup() {
+            let canvas = createCanvas(windowWidth, windowHeight);
+            canvas.parent('canvas-container');
+
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+
+            // iOS 13+ requires user gesture to request Devicemotion permission
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                const requestPerms = () => {
+                    if (permissionGranted) return;
+                    DeviceMotionEvent.requestPermission().then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('devicemotion', handleMotion);
+                            permissionGranted = true;
+                        }
+                    }).catch(console.error);
+                };
+                // Bind frictionless trigger to first touch
+                document.body.addEventListener('touchstart', requestPerms, { once: true });
+                document.body.addEventListener('click', requestPerms, { once: true });
+            } else {
+                window.addEventListener('devicemotion', handleMotion);
+            }
+        }
+
+        function handleMotion(e) {
+            let acc = e.accelerationIncludingGravity;
+            if (!acc) return;
+
+            if (lastAcc.x !== null) {
+                let deltaX = Math.abs(lastAcc.x - acc.x);
+                let deltaY = Math.abs(lastAcc.y - acc.y);
+                let deltaZ = Math.abs(lastAcc.z - acc.z);
+
+                if ((deltaX + deltaY + deltaZ) > shakeThreshold) {
+                    resetApp();
+                }
+            }
+            lastAcc = { x: acc.x, y: acc.y, z: acc.z };
+        }
+
+        function resetApp() {
+            agitationLevel = 1.0;
+            isCalm = false;
+            document.getElementById('breathing-guide').classList.remove('visible');
+            document.getElementById('instruction').classList.remove('hidden-text');
+
+            // Particles visually burst on reset to simulate sudden stress return
+            particles.forEach(p => {
+                p.vel = p5.Vector.random2D().mult(random(15, 30));
+            });
+
+            // Haptic burst to register shake
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        }
+
+        function draw() {
+            // Must use clear() so transparency preserves the SVG metaball filter
+            clear();
+
+            let currentX = mouseX || (touches.length ? touches[0].x : width / 2);
+            let currentY = mouseY || (touches.length ? touches[0].y : height / 2);
+            let interactionActive = mouseIsPressed || touches.length > 0;
+
+            let vel = 0;
+            if (interactionActive && prevX !== 0) {
+                // Determine steady circular motion by tracking delta position
+                vel = dist(currentX, currentY, prevX, prevY);
+            }
+
+            if (interactionActive) {
+                // Stirring drops agitation
+                document.getElementById('instruction').classList.add('hidden-text'); // Frictionless
+                if (vel > 1 && vel < 100) {
+                    agitationLevel -= 0.007; // Decay
+                }
+            } else {
+                // Interaction stops, stress creeps back
+                agitationLevel += 0.002;
+            }
+
+            agitationLevel = constrain(agitationLevel, 0, 1);
+
+            // The Intervention Logic
+            if (agitationLevel < 0.2 && !isCalm) {
+                isCalm = true;
+                document.getElementById('breathing-guide').classList.add('visible');
+                if (navigator.vibrate) navigator.vibrate([30, 60, 30]); // Satisfying entry haptics
+            } else if (agitationLevel >= 0.3 && isCalm) {
+                isCalm = false;
+                document.getElementById('breathing-guide').classList.remove('visible');
+            }
+
+            prevX = interactionActive ? currentX : 0;
+            prevY = interactionActive ? currentY : 0;
+
+            particles.forEach(p => {
+                p.applyForce(currentX, currentY, interactionActive);
+                p.update();
+                p.display();
+            });
+        }
+
+        class Particle {
+            constructor() {
+                this.pos = createVector(random(width), random(height));
+                this.vel = p5.Vector.random2D().mult(random(2, 6));
+                this.acc = createVector();
+                this.baseSize = random(20, 50); // Large enough to blob together
+            }
+
+            applyForce(cx, cy, active) {
+                let center = createVector(cx, cy);
+                let force = p5.Vector.sub(center, this.pos);
+                let d = force.mag();
+
+                if (active) {
+                    if (d < 450) {
+                        // Creating the Radial Centripetal swirl
+                        let dirToCenter = force.copy().normalize();
+                        let tangent = createVector(-dirToCenter.y, dirToCenter.x); // Perpendicular orbit
+
+                        let pullStrength = map(d, 0, 450, 0, 0.6); // Pulls inward at edges
+                        let orbitStrength = map(agitationLevel, 0, 1, 1.5, 8); // Fast chaotic swirl, slowing to harmonic loop
+
+                        dirToCenter.mult(pullStrength);
+                        tangent.mult(orbitStrength);
+
+                        this.acc.add(dirToCenter);
+                        this.acc.add(tangent);
+                    }
+                } else {
+                    // Drift toward center to prevent clumping off-screen
+                    if (d > height / 2.5) {
+                        force.normalize().mult(0.05);
+                        this.acc.add(force);
+                    }
+                }
+            }
+
+            update() {
+                // Visually simulate stress with chaotic jitter
+                if (agitationLevel > 0.6) {
+                    this.acc.add(p5.Vector.random2D().mult((agitationLevel - 0.5) * 2));
+                }
+
+                this.vel.add(this.acc);
+
+                // Max speed governed entirely by agitation
+                let maxSpeed = map(agitationLevel, 0, 1, 1, 14);
+                this.vel.limit(maxSpeed);
+
+                // Viscous friction drag (mercury fluid)
+                if (isCalm) {
+                    this.vel.mult(0.90); // Very viscous and slow
+                } else {
+                    this.vel.mult(0.96); // Runs fluid and hot
+                }
+
+                this.pos.add(this.vel);
+                this.acc.mult(0); // Reset forces
+
+                // Screen Wrap
+                let margin = 50;
+                if (this.pos.x < -margin) this.pos.x = width + margin;
+                if (this.pos.x > width + margin) this.pos.x = -margin;
+                if (this.pos.y < -margin) this.pos.y = height + margin;
+                if (this.pos.y > height + margin) this.pos.y = -margin;
+            }
+
+            display() {
+                // Color mapping:
+                // Agitated (1.0) -> Red/Orange: r=255, g=50, b=0
+                // Harmonic (0.0) -> Teal/Blue: r=0, g=200, b=255
+                let r = map(agitationLevel, 0, 1, 0, 255);
+                let g = map(agitationLevel, 0, 1, 200, 50);
+                let b = map(agitationLevel, 0, 1, 255, 0);
+
+                fill(r, g, b);
+                noStroke();
+
+                // Pulsate slightly when calm to sync with the breather
+                let currentSize = this.baseSize;
+                if (isCalm) {
+                    currentSize += sin(frameCount * 0.05 + this.pos.x) * 4;
+                }
+
+                ellipse(this.pos.x, this.pos.y, currentSize);
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+
+</html>

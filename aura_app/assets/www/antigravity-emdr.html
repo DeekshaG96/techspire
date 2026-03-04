@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Antigravity - Bilateral Grounding</title>
+    <style>
+        :root {
+            --bg-chaos: #1a0b2e;
+            --bg-calm: #ff7e5f;
+            --bg-calm-alt: #feb47b;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-chaos);
+            font-family: 'Inter', system-ui, sans-serif;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background 5s ease-in-out;
+        }
+
+        #bg-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-calm) 0%, var(--bg-calm-alt) 100%);
+            opacity: 0;
+            transition: opacity 8s ease-in-out;
+            z-index: 0;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Bilateral Zones */
+        #left-zone,
+        #right-zone {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #left-zone {
+            left: 0;
+            /* Subtle visual hint */
+            box-shadow: inset 10px 0 50px rgba(255, 255, 255, 0.02);
+        }
+
+        #right-zone {
+            right: 0;
+            box-shadow: inset -10px 0 50px rgba(255, 255, 255, 0.02);
+        }
+
+        /* Tap Feedbacks */
+        .tap-ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(0);
+            animation: ripple 0.8s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* Glassmorphism UI Overlay */
+        #glass-ui {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 2s, filter 2s;
+            text-align: center;
+        }
+
+        /* Intervention Phase */
+        #intervention-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 4s ease-in-out;
+        }
+
+        .fractal-layer {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+            animation: expandFractal 20s infinite linear;
+        }
+
+        .fractal-layer:nth-child(2) {
+            animation-delay: -5s;
+        }
+
+        .fractal-layer:nth-child(3) {
+            animation-delay: -10s;
+        }
+
+        .fractal-layer:nth-child(4) {
+            animation-delay: -15s;
+        }
+
+        @keyframes expandFractal {
+            0% {
+                width: 50px;
+                height: 50px;
+                opacity: 0;
+                transform: rotate(0deg);
+            }
+
+            30% {
+                opacity: 1;
+            }
+
+            70% {
+                opacity: 0.8;
+            }
+
+            100% {
+                width: 200vw;
+                height: 200vw;
+                opacity: 0;
+                transform: rotate(180deg);
+            }
+        }
+
+        /* Breathing Guide */
+        #breathing-text {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-align: center;
+            z-index: 30;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            opacity: 0;
+        }
+
+        .breathe-cycle {
+            animation: breathePhase 19s infinite linear;
+            /* 4 Inhale + 7 Hold + 8 Exhale */
+        }
+
+        @keyframes breathePhase {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            5% {
+                transform: scale(0.9);
+                opacity: 1;
+            }
+
+            /* Inhale starts */
+            21% {
+                transform: scale(1.4);
+                opacity: 1;
+            }
+
+            /* 4s: Inhale ends, Hold starts */
+            58% {
+                transform: scale(1.4);
+                opacity: 0.8;
+            }
+
+            /* 11s: Hold ends, Exhale starts */
+            95% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+
+            /* 19s: Exhale ends */
+            100% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        /* Home Button */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+    </style>
+    <!-- Include p5.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+
+<body>
+    <a href="index.html" class="home-btn" title="Return Home">🏠</a>
+
+    <div id="bg-gradient"></div>
+    <div id="canvas-container"></div>
+
+    <div id="glass-ui">Tap Left & Right<br><span style="font-size: 0.7rem; opacity: 0.7">Alternating Rhythm</span></div>
+
+    <div id="left-zone"></div>
+    <div id="right-zone"></div>
+
+    <div id="intervention-container">
+        <!-- Fractal peripheral expansion -->
+        <div class="fractal-layer"></div>
+        <div class="fractal-layer"></div>
+        <div class="fractal-layer"></div>
+        <div class="fractal-layer"></div>
+        <!-- 4-7-8 Breathing Indicator -->
+        <div id="breathing-text">Breath</div>
+    </div>
+
+    <script>
+        // --- LOGIC LAYER (Chaos & Rhythm) ---
+        let chaosScore = 1.0; // 1.0 = Max Chaos, 0.0 = Steady Rhythm
+        let targetChaos = 1.0;
+        let lastTapSide = null; // 'left' or 'right'
+        let tapIntervals = []; // Store times between taps
+        let lastTapTime = 0;
+        let steadyTimer = 0; // Tracks consecutive ms of low chaos
+        const REQUIRED_STEADY_TIME = 10000; // 10 seconds
+        let isInterventionActive = false;
+
+        // --- AUDIO LAYER (Web Audio API) ---
+        let audioCtx;
+        let leftOsc, rightOsc;
+        let rumbleBuffer, rumbleSource, rumbleFilter, rumbleGain;
+        let binauralGain;
+        let audioInitialized = false;
+
+        // --- VISUAL ENGINE (p5.js) ---
+        let particles = [];
+        const NUM_PARTICLES = 60;
+
+        // Initialization of Audio
+        function initAudio() {
+            if (audioInitialized) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            // 1. Binaural Beats (Steady state)
+            // Base frequency 136.1 Hz (Ohm tuning)
+            const baseFreq = 136.1;
+
+            leftOsc = audioCtx.createOscillator();
+            rightOsc = audioCtx.createOscillator();
+            leftOsc.type = 'sine';
+            rightOsc.type = 'sine';
+            leftOsc.frequency.value = baseFreq;
+            rightOsc.frequency.value = baseFreq; // Will offset when steady
+
+            let leftPanner = audioCtx.createStereoPanner();
+            let rightPanner = audioCtx.createStereoPanner();
+            leftPanner.pan.value = -1;
+            rightPanner.pan.value = 1;
+
+            binauralGain = audioCtx.createGain();
+            binauralGain.gain.value = 0; // Starts silent
+
+            leftOsc.connect(leftPanner).connect(binauralGain);
+            rightOsc.connect(rightPanner).connect(binauralGain);
+            binauralGain.connect(audioCtx.destination);
+
+            leftOsc.start();
+            rightOsc.start();
+
+            // 2. Muffled Rumbling (Chaos state)
+            const bufferSize = audioCtx.sampleRate * 2;
+            rumbleBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            let output = rumbleBuffer.getChannelData(0);
+            let lastOut = 0;
+            // Brownian noise generation for deep rumble
+            for (let i = 0; i < bufferSize; i++) {
+                let white = Math.random() * 2 - 1;
+                output[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = output[i];
+                output[i] *= 3.5;
+            }
+            rumbleSource = audioCtx.createBufferSource();
+            rumbleSource.buffer = rumbleBuffer;
+            rumbleSource.loop = true;
+
+            rumbleFilter = audioCtx.createBiquadFilter();
+            rumbleFilter.type = 'lowpass';
+            rumbleFilter.frequency.value = 200; // Muffled
+
+            rumbleGain = audioCtx.createGain();
+            rumbleGain.gain.value = 0; // Chaos determines volume
+
+            rumbleSource.connect(rumbleFilter).connect(rumbleGain).connect(audioCtx.destination);
+            rumbleSource.start();
+
+            audioInitialized = true;
+        }
+
+        // Tap Handlers
+        function setupInteraction() {
+            const leftZone = document.getElementById('left-zone');
+            const rightZone = document.getElementById('right-zone');
+
+            const handleTap = (side, e) => {
+                if (isInterventionActive) return;
+                initAudio();
+
+                // Visual feedback
+                let touchX = e.touches ? e.touches[0].clientX : e.clientX;
+                let touchY = e.touches ? e.touches[0].clientY : e.clientY;
+                createRipple(touchX, touchY, side === 'left' ? leftZone : rightZone);
+
+                const now = performance.now();
+
+                // --- LOGIC: EMDR Pattern Check ---
+                if (lastTapSide === null) {
+                    targetChaos = 0.9;
+                } else if (lastTapSide === side) {
+                    // Punish double tapping the same side (Panic loop)
+                    targetChaos = Math.min(1.0, targetChaos + 0.3);
+                    tapIntervals = []; // Reset rhythm
+                } else {
+                    // Alternating tap (Bilateral stimulation)
+                    let interval = now - lastTapTime;
+
+                    // Too fast (< 200ms) or too slow (> 2000ms) is erratic
+                    if (interval < 200 || interval > 2000) {
+                        targetChaos = Math.min(1.0, targetChaos + 0.1);
+                        tapIntervals = [];
+                    } else {
+                        tapIntervals.push(interval);
+                        if (tapIntervals.length > 5) tapIntervals.shift(); // Keep last 5
+
+                        if (tapIntervals.length > 1) {
+                            // Calculate variance in rhythm
+                            let sum = tapIntervals.reduce((a, b) => a + b, 0);
+                            let avg = sum / tapIntervals.length;
+                            let variance = tapIntervals.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / tapIntervals.length;
+
+                            // A lower variance means a steady rhythm
+                            if (variance < 20000) {
+                                targetChaos = Math.max(0.0, targetChaos - 0.2); // Calm down
+                            } else {
+                                targetChaos = Math.min(1.0, targetChaos + 0.1); // Still erratic
+                            }
+                        } else {
+                            targetChaos = Math.max(0.0, targetChaos - 0.05);
+                        }
+                    }
+                }
+
+                lastTapSide = side;
+                lastTapTime = now;
+            };
+
+            leftZone.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap('left', e); });
+            rightZone.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap('right', e); });
+            // Mouse fallbacks for desktop testing
+            leftZone.addEventListener('mousedown', (e) => handleTap('left', e));
+            rightZone.addEventListener('mousedown', (e) => handleTap('right', e));
+        }
+
+        function createRipple(x, y, container) {
+            let ripple = document.createElement('div');
+            ripple.className = 'tap-ripple';
+            // Size based on chaos (larger when chaotic, small when calm)
+            let size = 100 + (chaosScore * 200);
+            ripple.style.width = size + 'px';
+            ripple.style.height = size + 'px';
+
+            // Adjust coordinates to container
+            let rect = container.getBoundingClientRect();
+            ripple.style.left = (x - rect.left - size / 2) + 'px';
+            ripple.style.top = (y - rect.top - size / 2) + 'px';
+
+            container.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 800);
+        }
+
+        // --- p5.js SETUP & DRAW ---
+        function setup() {
+            let canvas = createCanvas(windowWidth, windowHeight);
+            canvas.parent('canvas-container');
+            noStroke();
+
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                particles.push(new Particle());
+            }
+
+            setupInteraction();
+        }
+
+        function draw() {
+            clear(); // We use CSS for the background gradient transitions
+
+            // Smoothly interpolate chaos
+            chaosScore = lerp(chaosScore, targetChaos, 0.05);
+
+            // Audio Modulation
+            if (audioInitialized) {
+                // Rumble volume mapped to high chaos
+                let rumbleVol = map(chaosScore, 0.4, 1.0, 0, 1.5, true);
+                rumbleGain.gain.setTargetAtTime(rumbleVol, audioCtx.currentTime, 0.1);
+
+                // Binaural beats fade in as chaos lowers
+                let binVol = map(chaosScore, 0.0, 0.6, 0.5, 0, true);
+                binauralGain.gain.setTargetAtTime(binVol, audioCtx.currentTime, 0.1);
+
+                // Calming frequency sweep for binaurals (Theta 4Hz to Alpha 8Hz)
+                if (chaosScore < 0.6) {
+                    let beatFreq = map(chaosScore, 0.6, 0.0, 8, 4);
+                    rightOsc.frequency.setTargetAtTime(136.1 + beatFreq, audioCtx.currentTime, 0.1);
+                }
+            }
+
+            // --- THE ANTIGRAVITY TIMING LOGIC ---
+            if (chaosScore < 0.2 && !isInterventionActive) {
+                steadyTimer += deltaTime;
+                document.getElementById('glass-ui').style.opacity = '0';
+
+                // Show gradient background
+                document.getElementById('bg-gradient').style.opacity = map(chaosScore, 0.2, 0.0, 0.5, 1.0);
+
+                if (steadyTimer >= REQUIRED_STEADY_TIME) {
+                    triggerIntervention();
+                }
+            } else if (chaosScore >= 0.2 && !isInterventionActive) {
+                steadyTimer = Math.max(0, steadyTimer - deltaTime * 2); // Decay progress
+                document.getElementById('glass-ui').style.opacity = '1';
+                document.getElementById('bg-gradient').style.opacity = '0';
+            }
+
+            // Draw visual engine
+            for (let p of particles) {
+                p.update();
+                p.display();
+            }
+        }
+
+        // Particle Class (Heavy Stones -> Glowing Orbs)
+        class Particle {
+            constructor() {
+                this.pos = createVector(random(width), random(height));
+                this.vel = createVector(0, 0);
+                this.size = random(8, 30);
+                this.mass = this.size;
+                this.noiseOffset = random(1000); // For floating jitter
+            }
+
+            update() {
+                // Determine Gravity Vector based on Chaos Score
+                // Chaos = 1.0 (Downwards, Heavy 9.8m/s style)
+                // Chaos = 0.0 (Upwards, Antigravity, Float)
+                let gravityY = map(chaosScore, 0, 1, -0.8, 1.5);
+                let acc = createVector(0, gravityY);
+
+                // Jitter decreases as chaos decreases
+                let jitter = map(chaosScore, 0, 1, 0.1, 1.5);
+                acc.x += map(noise(this.noiseOffset), 0, 1, -jitter, jitter);
+                this.noiseOffset += 0.01;
+
+                this.vel.add(acc);
+
+                // Friction
+                if (chaosScore < 0.5) {
+                    // Fluid, terminal velocity is low
+                    this.vel.limit(map(chaosScore, 0, 0.5, 1, 3));
+                    this.vel.mult(0.95); // Drag
+                } else {
+                    // Heavy, falls fast
+                    this.vel.limit(map(chaosScore, 0.5, 1.0, 3, 15));
+                }
+
+                this.pos.add(this.vel);
+
+                // Screen wrapping based on gravity direction
+                if (gravityY > 0 && this.pos.y > height + this.size) {
+                    this.pos.y = -this.size; // Reset to top when falling
+                    this.pos.x = random(width);
+                    this.vel.mult(0.2);
+                } else if (gravityY <= 0 && this.pos.y < -this.size) {
+                    this.pos.y = height + this.size; // Reset to bottom when floating
+                    this.pos.x = random(width);
+                    this.vel.mult(0.2);
+                }
+
+                // X-axis limits
+                if (this.pos.x > width + this.size) this.pos.x = -this.size;
+                if (this.pos.x < -this.size) this.pos.x = width + this.size;
+            }
+
+            display() {
+                // Morph visual style
+                // Chaos: Dark heavy stones (#1a1a1a to #2d2d2d)
+                // Calm: Glowing soft orbs (rgba(255, 200, 150, alpha))
+
+                let stoneColor = color('#120524'); // Dark
+                let orbColor = color(255, 230, 200); // Light
+
+                let morphAmt = map(chaosScore, 0.0, 0.8, 1.0, 0.0, true);
+                let currentColor = lerpColor(stoneColor, orbColor, morphAmt);
+
+                // When becoming orbs, add alpha and glow
+                let alpha = map(chaosScore, 0.0, 0.8, 150, 255, true);
+                currentColor.setAlpha(alpha);
+
+                fill(currentColor);
+
+                if (chaosScore < 0.5) {
+                    // Soft edges for floating orbs
+                    drawingContext.shadowBlur = map(chaosScore, 0, 0.5, 30, 0);
+                    drawingContext.shadowColor = 'rgba(255,230,200,0.6)';
+                } else {
+                    drawingContext.shadowBlur = 0; // Hard edges for stones
+                }
+
+                // Smooth morph shape
+                let currentSize = map(chaosScore, 0, 1, this.size * 1.5, this.size);
+                ellipse(this.pos.x, this.pos.y, currentSize);
+
+                // Reset shadow
+                drawingContext.shadowBlur = 0;
+            }
+        }
+
+        // --- INTERVENTION PHASE ---
+        function triggerIntervention() {
+            isInterventionActive = true;
+
+            // Hide tapping zones
+            document.getElementById('left-zone').style.pointerEvents = 'none';
+            document.getElementById('right-zone').style.pointerEvents = 'none';
+
+            // Show intervention UI (Mandala + Text)
+            const interventionContainer = document.getElementById('intervention-container');
+            interventionContainer.style.opacity = '1';
+
+            // Particles fade out (handled implicitly by gravity continuing to float them off-screen while we stop resetting them inside the screen in theory, or we just let them float)
+            particles.forEach(p => p.size *= 0.5); // Shrink them to give focus to the breathing
+
+            // 4-7-8 Breathing Loop Logic driven by JavaScript for text updates
+            const breathingText = document.getElementById('breathing-text');
+            breathingText.classList.add('breathe-cycle');
+
+            const runBreathingCycle = () => {
+                if (!isInterventionActive) return;
+
+                breathingText.innerText = 'Inhale'; // 4 seconds
+                setTimeout(() => {
+                    if (!isInterventionActive) return;
+                    breathingText.innerText = 'Hold'; // 7 seconds
+                    setTimeout(() => {
+                        if (!isInterventionActive) return;
+                        breathingText.innerText = 'Exhale'; // 8 seconds
+                        setTimeout(runBreathingCycle, 8000);
+                    }, 7000);
+                }, 4000);
+            };
+
+            runBreathingCycle();
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+
+        // Edge case: if the user stops tapping entirely during high chaos, stress drops? 
+        // No, stress should creep up if they stop tapping entirely.
+        setInterval(() => {
+            if (!isInterventionActive && audioInitialized) {
+                let now = performance.now();
+                if (now - lastTapTime > 3000) {
+                    // Over 3 seconds of no tapping, panic returns
+                    targetChaos = Math.min(1.0, targetChaos + 0.1);
+                    tapIntervals = [];
+                }
+            }
+        }, 1000);
+
+    </script>
+</body>
+
+</html>
